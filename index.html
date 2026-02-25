@@ -1,536 +1,1078 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Economic Nexus Thresholds by State</title>
-<style>
-:root {
-  --tufts-blue: #3D85C8;
-  --alabaster: #F2F0EB;
-  --surface: #EAE8E2;
-  --surface2: #D8D5CC;
-  --haiti: #1A1040;
-  --moonstone: #4E9BAD;
-  --no-tax-fill: #8B7FB8;
-  --no-tax-stroke: #6B5FA0;
-  --drawer-w: 380px;
-  --radius: 10px;
-  --shadow: 0 2px 16px rgba(26,16,64,.10);
-}
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%}
-body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--alabaster);color:var(--haiti);display:flex;flex-direction:column;min-height:100vh}
-a{color:var(--tufts-blue)}a:hover{text-decoration:underline}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Economic Nexus Thresholds by State</title>
+  <meta name="description" content="Interactive U.S. map of economic nexus thresholds by state (informational only)." />
 
-header{background:linear-gradient(135deg,var(--haiti) 0%,#2B2060 100%);color:#fff;padding:20px 32px 16px;flex-shrink:0;position:relative;overflow:hidden}
-header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#7EA7C4,#5A8FB8,#4E9BAD,#6BADA0,#7BBFB5,#9ECFC8)}
-header h1{font-size:clamp(1.1rem,2.5vw,1.65rem);font-weight:700;letter-spacing:-.02em;margin-bottom:5px}
-header p{font-size:.82rem;opacity:.72;max-width:660px;line-height:1.55}
+  <style>
+    :root{
+      /* Brand-ish approximations */
+      --tufts-blue:#3E7BB6;
+      --alabaster:#F5F2EC;
+      --haiti:#1F1B3A;
 
-.controls{padding:10px 22px;background:var(--surface);border-bottom:1px solid var(--surface2);display:flex;flex-wrap:wrap;gap:9px;align-items:center;position:sticky;top:0;z-index:50;box-shadow:0 2px 6px rgba(26,16,64,.06)}
-.search-wrap{position:relative;flex:1;min-width:180px;max-width:300px}
-.search-wrap input{width:100%;padding:7px 11px 7px 32px;border:1.5px solid var(--surface2);border-radius:8px;font-size:.83rem;background:#fff;color:var(--haiti);transition:border-color .2s;outline:none}
-.search-wrap input:focus{border-color:var(--tufts-blue);box-shadow:0 0 0 3px rgba(61,133,200,.13)}
-.search-icon{position:absolute;left:9px;top:50%;transform:translateY(-50%);opacity:.35;pointer-events:none}
-.autocomplete{position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:1.5px solid var(--surface2);border-radius:8px;box-shadow:var(--shadow);max-height:210px;overflow-y:auto;z-index:200;display:none}
-.autocomplete li{list-style:none;padding:7px 12px;cursor:pointer;font-size:.83rem;display:flex;justify-content:space-between}
-.autocomplete li:hover,.autocomplete li.active{background:var(--tufts-blue);color:#fff}
-.compare-toggle{display:flex;align-items:center;gap:6px;font-size:.8rem;font-weight:600;cursor:pointer;padding:7px 12px;border:1.5px solid var(--tufts-blue);border-radius:8px;background:#fff;color:var(--tufts-blue);transition:all .2s;white-space:nowrap}
-.compare-toggle:hover,.compare-toggle.active{background:var(--tufts-blue);color:#fff}
-.compare-count{background:var(--moonstone);color:#fff;border-radius:20px;padding:1px 6px;font-size:.7rem}
+      /* Softer balanced palette */
+      --surface:#FFFFFF;
+      --surface-2:#F1F5FA;
+      --border:#D7E1EE;
+      --muted:#5A6078;
+      --shadow:0 14px 40px rgba(18, 28, 68, .10);
 
-.legend{display:flex;flex-wrap:wrap;gap:7px 16px;padding:8px 22px;background:var(--surface);border-bottom:1px solid var(--surface2);font-size:.73rem;color:var(--haiti);align-items:center}
-.legend-item{display:flex;align-items:center;gap:5px}
-.ls{width:13px;height:13px;border-radius:3px;border:1px solid rgba(0,0,0,.15);flex-shrink:0}
+      /* Transition palette accents (subtle) */
+      --silk:#BFD2E8;
+      --faded:#A9C4E1;
+      --koi:#86B4DA;
+      --moonstone:#6FA7D8;
+      --gulf:#5C97CE;
+      --neptune:#4B8BC4;
+      --teal:#C8E7E3;
 
-main{flex:1;display:flex;position:relative;overflow:hidden}
-.map-wrap{flex:1;display:flex;flex-direction:column;align-items:center;padding:16px 16px 10px;transition:margin-right .3s;min-width:0;overflow-y:auto}
-.map-wrap.drawer-open{margin-right:var(--drawer-w)}
+      --focus:#1d4ed8;
+      --danger:#B91C1C;
+    }
 
-#us-map{width:100%;max-width:960px;height:auto;display:block}
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background: radial-gradient(1200px 600px at 20% 0%, #E9F1FB 0%, var(--alabaster) 55%, #ECF5F4 100%);
+      color:var(--haiti);
+    }
 
-/* Default state styles */
-#us-map .state{stroke:#fff;stroke-width:.7;stroke-linejoin:round;cursor:pointer;outline:none;transition:fill .15s,filter .15s}
-#us-map .state.nexus{fill:#C8DDEF}
-#us-map .state.nexus:hover,#us-map .state.nexus:focus{fill:#7EB8E0;stroke:#2d6aaa;stroke-width:1.5;filter:drop-shadow(0 0 5px rgba(61,133,200,.45))}
-#us-map .state.nexus.selected{fill:var(--tufts-blue);stroke:var(--haiti);stroke-width:1.5}
-#us-map .state.nexus.compare-sel{fill:var(--moonstone);stroke:var(--haiti);stroke-width:1.5}
-#us-map .state.no-tax{fill:#C8BFE0}
-#us-map .state.no-tax:hover,#us-map .state.no-tax:focus{fill:#A89FCC;stroke:#6B5FA0;stroke-width:1.5;filter:drop-shadow(0 0 5px rgba(107,95,160,.4))}
-#us-map .state.no-tax.selected{fill:#7B68C2;stroke:var(--haiti);stroke-width:1.5}
+    a{ color:var(--tufts-blue); }
+    a:hover{ text-decoration:underline; }
 
-#us-map .state-label{font-size:6.5px;font-family:'Segoe UI',system-ui,sans-serif;font-weight:700;fill:#1A1040;pointer-events:none;user-select:none}
+    .wrap{
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 18px 16px 40px;
+    }
 
-/* Inset boxes */
-.inset-box{stroke:#aaa;stroke-width:.8;fill:none}
+    header{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      padding: 16px 16px 8px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.78));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(6px);
+    }
 
-#tip{position:fixed;background:var(--haiti);color:#fff;padding:9px 13px;border-radius:8px;font-size:.77rem;pointer-events:none;z-index:500;max-width:230px;box-shadow:0 4px 20px rgba(0,0,0,.3);opacity:0;transition:opacity .12s;line-height:1.5;border-top:3px solid var(--tufts-blue)}
-#tip.vis{opacity:1}
-#tip.no-tax-tip{border-top-color:#7B68C2}
-#tip strong{display:block;font-size:.83rem;margin-bottom:3px}
-.badge{display:inline-block;margin-top:4px;background:rgba(255,255,255,.15);padding:2px 7px;border-radius:20px;font-size:.68rem}
+    h1{
+      margin:0;
+      font-size: 24px;
+      letter-spacing: -0.02em;
+    }
+    .subtitle{
+      margin:0;
+      color: var(--muted);
+      line-height: 1.4;
+      font-size: 13.5px;
+      max-width: 72ch;
+    }
 
-.drawer{position:fixed;right:0;top:0;bottom:0;width:var(--drawer-w);background:var(--alabaster);box-shadow:-3px 0 24px rgba(26,16,64,.15);z-index:100;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .28s ease}
-.drawer.open{transform:none}
-.d-head{padding:16px 18px;display:flex;justify-content:space-between;align-items:flex-start;flex-shrink:0}
-.d-head.nexus-head{background:linear-gradient(135deg,var(--haiti),#2B2060);color:#fff}
-.d-head.no-tax-head{background:linear-gradient(135deg,#3D2F6B,#5A4890);color:#fff}
-.d-abbr{font-size:2rem;font-weight:800;opacity:.22;line-height:1}
-.d-head h2{font-size:1.1rem;font-weight:700;margin-top:3px}
-.close-btn{background:none;border:none;color:inherit;font-size:1.2rem;cursor:pointer;opacity:.65;padding:0;line-height:1;flex-shrink:0;margin-left:10px}
-.close-btn:hover{opacity:1}
-.d-body{overflow-y:auto;padding:16px 18px;flex:1}
-.card{background:#fff;border-radius:var(--radius);padding:13px 15px;margin-bottom:13px;box-shadow:var(--shadow)}
-.card h3{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--tufts-blue);margin-bottom:9px}
-.card h3.purple{color:#7B68C2}
-.row{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:1px solid var(--surface);font-size:.83rem;gap:10px}
-.row:last-child{border-bottom:none}
-.lbl{color:#777;flex-shrink:0}.val{font-weight:600;text-align:right}
-.pill{display:inline-block;padding:2px 8px;border-radius:20px;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
-.p-or{background:#EEF6FF;color:#1a6cba}.p-rev{background:#EDF7EE;color:#1a7a3c}.p-tr{background:#FFF7EC;color:#9a5c00}.p-and{background:#F5EEFF;color:#6B3FA0}
-.note-box{background:#FDFAF0;border-left:3px solid #E6C040;padding:9px 12px;border-radius:0 6px 6px 0;font-size:.78rem;color:#7A5500;line-height:1.55;margin-bottom:13px}
-.no-tax-box{background:#F4F1FB;border-left:3px solid #9A8FB5;padding:9px 12px;border-radius:0 6px 6px 0;font-size:.8rem;color:#4A3F6B;line-height:1.55;margin-bottom:13px}
-.dor-btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:10px 14px;background:var(--tufts-blue);color:#fff;border:none;border-radius:var(--radius);font-size:.85rem;font-weight:600;cursor:pointer;text-decoration:none;transition:background .2s;margin-bottom:8px}
-.dor-btn:hover{background:#2d6aaa;color:#fff;text-decoration:none}
-.dor-btn.purple{background:#7B68C2}.dor-btn.purple:hover{background:#6450A8}
-.dor-url{font-size:.68rem;color:#bbb;word-break:break-all;text-align:center;margin-bottom:13px}
-.add-cmp{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:8px 14px;background:#fff;color:var(--tufts-blue);border:1.5px solid var(--tufts-blue);border-radius:var(--radius);font-size:.8rem;font-weight:600;cursor:pointer;transition:all .2s}
-.add-cmp:hover{background:var(--tufts-blue);color:#fff}
-.add-cmp.rem{border-color:var(--moonstone);color:var(--moonstone)}.add-cmp.rem:hover{background:var(--moonstone);color:#fff}
-.upd{font-size:.67rem;color:#bbb;text-align:center;margin-top:10px}
+    .controls{
+      margin-top: 14px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
 
-.cmp-panel{width:100%;max-width:960px;margin-top:14px;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
-.cmp-head{padding:12px 16px;background:var(--haiti);color:#fff;display:flex;align-items:center;justify-content:space-between}
-.cmp-head h3{font-size:.88rem;font-weight:700}
-.clr-btn{background:none;border:1px solid rgba(255,255,255,.3);border-radius:6px;font-size:.7rem;padding:3px 9px;cursor:pointer;color:rgba(255,255,255,.65)}
-.clr-btn:hover{background:rgba(255,255,255,.1);color:#fff}
-.cmp-scroll{overflow-x:auto}
-table.cmp{width:100%;border-collapse:collapse;font-size:.78rem}
-table.cmp th{background:var(--surface);color:var(--haiti);padding:7px 11px;text-align:left;font-weight:700;font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;border-bottom:2px solid var(--surface2)}
-table.cmp td{padding:8px 11px;border-bottom:1px solid var(--surface);vertical-align:middle}
-table.cmp tr:last-child td{border-bottom:none}
-table.cmp tr:hover td{background:rgba(61,133,200,.04)}
-.rm-row{background:none;border:none;color:#ccc;cursor:pointer;font-size:.9rem;padding:0 3px}
-.rm-row:hover{color:#c00}
+    .control{
+      flex: 1 1 280px;
+      display:flex;
+      gap:8px;
+      align-items:center;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.85);
+      box-shadow: 0 8px 22px rgba(18, 28, 68, .06);
+    }
 
-#ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.22);z-index:90;backdrop-filter:blur(1px)}
-#ov.vis{display:block}
+    .control label{
+      font-size: 12px;
+      color: var(--muted);
+      white-space:nowrap;
+    }
 
-footer{background:var(--surface);border-top:1px solid var(--surface2);color:#888;font-size:.73rem;text-align:center;padding:11px 22px;line-height:1.6;flex-shrink:0}
-footer strong{color:var(--haiti)}
+    input[type="text"]{
+      width:100%;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: var(--haiti);
+      font-size: 14px;
+      padding: 4px;
+    }
 
-@media(max-width:768px){
-  :root{--drawer-w:100vw}
-  .map-wrap.drawer-open{margin-right:0}
-  .drawer{top:auto;height:88vh;border-radius:var(--radius) var(--radius) 0 0;transform:translateY(100%)}
-  .drawer.open{transform:none}
-  header{padding:13px 16px}
-  .controls,.legend{padding:9px 13px}
-  .map-wrap{padding:8px 6px}
-}
-</style>
+    .btn{
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(62,123,182,.95), rgba(62,123,182,.85));
+      color: #fff;
+      padding: 10px 12px;
+      border-radius: 14px;
+      cursor:pointer;
+      font-weight: 600;
+      font-size: 13px;
+      box-shadow: 0 10px 24px rgba(62,123,182,.22);
+      transition: transform .08s ease, filter .15s ease;
+      user-select:none;
+    }
+    .btn:hover{ filter:brightness(1.02); }
+    .btn:active{ transform: translateY(1px); }
+
+    .btn.secondary{
+      background: rgba(255,255,255,.9);
+      color: var(--haiti);
+      box-shadow: 0 10px 24px rgba(18, 28, 68, .08);
+    }
+
+    .pill{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.85);
+      box-shadow: 0 8px 22px rgba(18, 28, 68, .06);
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .pill strong{ color: var(--haiti); font-weight: 700; }
+
+    .grid{
+      margin-top: 14px;
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    .card{
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: rgba(255,255,255,.82);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+
+    .mapShell{
+      position: relative;
+      padding: 10px;
+      background: linear-gradient(180deg, rgba(241,245,250,.7), rgba(255,255,255,.55));
+    }
+
+    /* Map styling */
+    .mapShell svg{
+      width: 100%;
+      height: auto;
+      display:block;
+    }
+
+    .state{
+      fill: rgba(62,123,182,.08); /* very light Tufts tint */
+      stroke: rgba(31,27,58,.55);
+      stroke-width: 0.7;
+      vector-effect: non-scaling-stroke;
+      cursor:pointer;
+      transition: fill .14s ease, stroke-width .14s ease, filter .14s ease;
+      outline: none;
+    }
+
+    .state:hover,
+    .state:focus{
+      fill: url(#hoverGrad);
+      stroke-width: 1.6;
+      filter: drop-shadow(0 6px 10px rgba(18, 28, 68, .10));
+    }
+
+    .state.selected{
+      fill: var(--tufts-blue);
+      stroke: rgba(255,255,255,.95);
+      stroke-width: 1.1;
+    }
+
+    .state.noNexus{
+      fill: rgba(90,96,120,.12);
+      stroke: rgba(90,96,120,.55);
+      cursor: not-allowed;
+    }
+    .state.noNexus:hover,
+    .state.noNexus:focus{
+      fill: rgba(90,96,120,.16);
+      stroke-width: 1.3;
+      filter:none;
+    }
+
+    /* Tooltip */
+    .tooltip{
+      position: fixed;
+      z-index: 50;
+      pointer-events: none;
+      max-width: 320px;
+      background: rgba(31,27,58,.96);
+      color: #fff;
+      padding: 10px 12px;
+      border-radius: 12px;
+      box-shadow: 0 16px 40px rgba(0,0,0,.28);
+      border: 1px solid rgba(255,255,255,.14);
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity .12s ease, transform .12s ease;
+      font-size: 12.5px;
+      line-height: 1.25;
+    }
+    .tooltip.show{
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .tooltip .tTitle{ font-weight: 800; margin-bottom: 6px; }
+    .tooltip .tRow{ display:flex; gap:8px; }
+    .tooltip .tKey{ color: rgba(255,255,255,.72); min-width: 110px; }
+    .tooltip .tVal{ color:#fff; }
+
+    /* Drawer / Bottom sheet on mobile */
+    .drawerOverlay{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.26);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .18s ease;
+      z-index: 60;
+    }
+    .drawerOverlay.open{
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .drawer{
+      position: fixed;
+      top: 0;
+      right: 0;
+      height: 100%;
+      width: 420px;
+      max-width: 92vw;
+      background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(255,255,255,.94));
+      border-left: 1px solid var(--border);
+      box-shadow: -18px 0 50px rgba(18, 28, 68, .18);
+      transform: translateX(105%);
+      transition: transform .22s ease;
+      z-index: 70;
+      display:flex;
+      flex-direction:column;
+    }
+    .drawer.open{ transform: translateX(0); }
+
+    .drawerHeader{
+      padding: 14px 14px 10px;
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:10px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(241,245,250,.7), rgba(255,255,255,.55));
+    }
+    .drawerHeader h2{
+      margin:0;
+      font-size: 16px;
+      letter-spacing: -0.01em;
+    }
+    .drawerHeader .meta{
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .iconBtn{
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.9);
+      border-radius: 12px;
+      padding: 8px 10px;
+      cursor:pointer;
+      font-weight: 700;
+    }
+    .drawerBody{
+      padding: 14px;
+      overflow:auto;
+      display:flex;
+      flex-direction:column;
+      gap: 12px;
+    }
+    .kv{
+      border: 1px solid var(--border);
+      background: rgba(241,245,250,.7);
+      border-radius: 14px;
+      padding: 12px;
+    }
+    .kv .row{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      padding: 6px 0;
+      border-bottom: 1px dashed rgba(31,27,58,.12);
+      font-size: 13px;
+    }
+    .kv .row:last-child{ border-bottom:none; }
+    .kv .k{ color: var(--muted); }
+    .kv .v{ color: var(--haiti); font-weight: 700; text-align:right; }
+
+    .note{
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(185,28,28,.20);
+      background: rgba(185,28,28,.06);
+      color: #7a0f0f;
+      font-size: 13px;
+    }
+
+    .linkRow{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .linkBtn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(62,123,182,.95), rgba(62,123,182,.85));
+      color:#fff;
+      text-decoration:none;
+      font-weight: 700;
+      font-size: 13px;
+      box-shadow: 0 10px 24px rgba(62,123,182,.18);
+    }
+    .monoUrl{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+      color: var(--muted);
+      overflow-wrap:anywhere;
+    }
+
+    /* Compare panel */
+    .compare{
+      padding: 12px 14px 14px;
+      border-top: 1px solid var(--border);
+      background: rgba(241,245,250,.65);
+    }
+    .compareTop{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+    .compareTop .title{
+      font-weight: 800;
+      font-size: 13px;
+    }
+    .tableWrap{
+      overflow:auto;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: rgba(255,255,255,.88);
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      font-size: 13px;
+      min-width: 720px;
+    }
+    th,td{
+      text-align:left;
+      padding: 10px 10px;
+      border-bottom: 1px solid rgba(31,27,58,.10);
+      vertical-align: top;
+    }
+    th{
+      font-size: 12px;
+      color: var(--muted);
+      background: rgba(241,245,250,.9);
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    tr:last-child td{ border-bottom:none; }
+
+    footer{
+      margin-top: 14px;
+      padding: 12px 14px;
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      color: var(--muted);
+      font-size: 12.5px;
+    }
+
+    .errorBanner{
+      margin: 12px 12px 0;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(185,28,28,.22);
+      background: rgba(185,28,28,.07);
+      color: #7a0f0f;
+      font-size: 13px;
+    }
+
+    /* Focus ring */
+    :focus-visible{
+      outline: 3px solid rgba(29,78,216,.35);
+      outline-offset: 2px;
+      border-radius: 8px;
+    }
+
+    /* Bottom sheet on mobile */
+    @media (max-width: 860px){
+      .drawer{
+        top: auto;
+        bottom: 0;
+        right: 0;
+        width: 100%;
+        height: 68vh;
+        border-left: none;
+        border-top: 1px solid var(--border);
+        transform: translateY(105%);
+      }
+      .drawer.open{ transform: translateY(0); }
+    }
+
+    /* Screen-reader only */
+    .sr{
+      position:absolute;
+      width:1px;height:1px;
+      padding:0;margin:-1px;
+      overflow:hidden;clip:rect(0,0,0,0);
+      white-space:nowrap;border:0;
+    }
+  </style>
 </head>
+
 <body>
-<header>
-  <h1>Economic Nexus Thresholds by State</h1>
-  <p>Economic nexus requires out-of-state sellers to collect sales tax once they exceed a state's revenue or transaction threshold — no physical presence needed. Click any state for details and official resources.</p>
-</header>
+  <div class="wrap">
+    <header>
+      <h1>Economic Nexus Thresholds by State</h1>
+      <p class="subtitle">
+        Economic nexus means a seller may have sales tax obligations in a state based on revenue or transaction volume,
+        even without physical presence. This site is informational only—verify details with official state sources.
+      </p>
 
-<div class="controls">
-  <div class="search-wrap" role="search">
-    <svg class="search-icon" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-    <input type="text" id="srch" placeholder="Search state name or abbreviation…" aria-label="Search for a state" autocomplete="off"/>
-    <ul class="autocomplete" id="ac" role="listbox"></ul>
-  </div>
-  <button class="compare-toggle" id="cmp-toggle" aria-pressed="false">⚖️ Compare States <span class="compare-count" id="cmp-cnt" style="display:none">0</span></button>
-</div>
+      <div class="controls" role="region" aria-label="Controls">
+        <div class="control" role="search">
+          <label for="searchInput">Search</label>
+          <input id="searchInput" type="text" inputmode="search" placeholder="Type a state name or abbreviation (e.g., CA, California)" autocomplete="off" />
+        </div>
 
-<div class="legend">
-  <span style="font-weight:600;margin-right:2px">Legend:</span>
-  <span class="legend-item"><span class="ls" style="background:#C8DDEF;border-color:#3D85C8"></span>Economic nexus applies</span>
-  <span class="legend-item"><span class="ls" style="background:#C8BFE0;border-color:#7B68C2"></span>No state sales tax — nexus N/A</span>
-  <span class="legend-item"><span class="ls" style="background:#3D85C8;border-color:#1A1040"></span>Selected</span>
-  <span class="legend-item"><span class="ls" style="background:#4E9BAD;border-color:#1A1040"></span>In compare</span>
-</div>
+        <button id="compareToggle" class="btn secondary" type="button" aria-pressed="false">
+          Compare: Off
+        </button>
 
-<main>
-  <div class="map-wrap" id="map-wrap">
-    <svg id="us-map" viewBox="0 0 959 593" xmlns="http://www.w3.org/2000/svg" aria-label="United States economic nexus thresholds map" role="img">
-
-    <!-- CONTIGUOUS STATES — paths from Natural Earth / US Census public domain, reprojected to ~960x600 Albers -->
-    <path class="state" data-state="AL" d="M 596 453 L 592 453 L 581 453 L 574 452 L 570 404 L 568 390 L 567 371 L 566 353 L 573 352 L 583 352 L 592 352 L 596 352 Z"/>
-    <path class="state" data-state="AR" d="M 536 353 L 530 353 L 518 352 L 507 352 L 497 351 L 490 350 L 489 364 L 488 378 L 487 393 L 487 400 L 496 401 L 510 401 L 525 401 L 537 401 L 540 387 L 540 372 Z"/>
-    <path class="state" data-state="AZ" d="M 236 333 L 230 333 L 210 335 L 192 338 L 183 365 L 175 392 L 168 418 L 163 440 L 183 445 L 214 451 L 246 457 L 258 459 L 260 431 L 260 401 L 260 372 L 258 344 Z"/>
-    <path class="state" data-state="CA" d="M 152 253 L 143 272 L 131 293 L 118 315 L 107 339 L 100 362 L 97 386 L 99 407 L 106 425 L 115 435 L 129 437 L 145 437 L 163 440 L 168 418 L 175 392 L 183 365 L 192 338 L 210 335 L 218 320 L 221 303 L 218 284 L 211 263 L 200 245 L 184 233 L 169 228 L 155 231 Z"/>
-    <path class="state" data-state="CO" d="M 282 294 L 280 323 L 279 352 L 280 363 L 362 361 L 363 332 L 364 303 L 363 274 L 320 272 Z"/>
-    <path class="state" data-state="CT" d="M 756 208 L 748 205 L 742 215 L 742 226 L 749 228 L 759 223 L 760 213 Z"/>
-    <path class="state" data-state="DC" d="M 714 280 L 710 276 L 706 280 L 710 285 Z"/>
-    <path class="state" data-state="DE" d="M 735 249 L 730 246 L 725 253 L 724 266 L 730 272 L 737 267 Z"/>
-    <path class="state" data-state="FL" d="M 605 454 L 596 453 L 574 452 L 559 452 L 553 463 L 550 476 L 553 490 L 558 504 L 566 517 L 577 527 L 590 531 L 603 529 L 615 521 L 624 509 L 628 494 L 624 479 L 616 464 Z"/>
-    <path class="state" data-state="GA" d="M 640 355 L 626 354 L 612 353 L 605 353 L 596 352 L 596 403 L 596 454 L 605 454 L 616 454 L 624 452 L 632 441 L 637 428 L 641 413 L 643 397 L 643 380 L 641 362 Z"/>
-    <path class="state" data-state="IA" d="M 505 255 L 497 257 L 489 264 L 485 278 L 484 295 L 485 311 L 491 318 L 502 320 L 516 320 L 530 319 L 541 315 L 545 302 L 544 286 L 541 270 L 531 259 L 518 255 Z"/>
-    <path class="state" data-state="ID" d="M 218 151 L 207 158 L 200 176 L 197 200 L 200 225 L 204 248 L 209 267 L 219 265 L 231 260 L 244 256 L 256 266 L 262 253 L 264 232 L 265 211 L 263 189 L 257 168 L 247 155 Z"/>
-    <path class="state" data-state="IL" d="M 547 265 L 541 263 L 532 268 L 525 278 L 520 292 L 516 307 L 514 322 L 514 337 L 515 352 L 523 353 L 536 353 L 540 353 L 540 338 L 551 335 L 554 318 L 554 300 L 551 282 Z"/>
-    <path class="state" data-state="IN" d="M 581 265 L 572 263 L 564 266 L 556 272 L 552 283 L 551 298 L 551 314 L 551 328 L 554 338 L 565 338 L 575 337 L 581 329 L 583 314 L 584 297 L 582 280 Z"/>
-    <path class="state" data-state="KS" d="M 397 314 L 393 333 L 392 352 L 393 362 L 440 362 L 473 361 L 493 360 L 494 347 L 493 329 L 492 311 L 490 300 L 468 299 L 440 297 Z"/>
-    <path class="state" data-state="KY" d="M 593 308 L 584 307 L 574 308 L 563 310 L 551 313 L 543 319 L 543 330 L 549 336 L 560 339 L 573 337 L 583 333 L 594 326 L 602 319 L 602 311 Z"/>
-    <path class="state" data-state="LA" d="M 533 403 L 520 402 L 508 402 L 498 402 L 492 413 L 490 428 L 492 442 L 499 452 L 511 456 L 524 453 L 536 447 L 540 434 L 540 418 Z"/>
-    <path class="state" data-state="MA" d="M 768 196 L 757 192 L 750 196 L 747 208 L 751 216 L 762 218 L 773 213 L 775 203 Z"/>
-    <path class="state" data-state="MD" d="M 712 274 L 700 269 L 690 267 L 680 269 L 672 276 L 671 285 L 677 291 L 689 293 L 702 291 L 713 284 Z"/>
-    <path class="state" data-state="ME" d="M 797 152 L 787 147 L 778 153 L 771 163 L 768 177 L 773 187 L 783 191 L 795 186 L 802 173 Z"/>
-    <path class="state" data-state="MI" d="M 564 171 L 552 167 L 542 172 L 535 185 L 534 201 L 539 214 L 551 219 L 564 215 L 574 204 L 576 189 Z M 538 224 L 527 219 L 517 225 L 514 238 L 516 252 L 525 260 L 538 261 L 549 254 L 553 241 L 549 229 Z"/>
-    <path class="state" data-state="MN" d="M 491 155 L 479 151 L 467 157 L 457 169 L 452 185 L 451 204 L 455 223 L 463 238 L 474 247 L 486 249 L 498 244 L 505 230 L 506 212 L 504 191 L 502 170 Z"/>
-    <path class="state" data-state="MO" d="M 511 320 L 503 322 L 495 326 L 492 338 L 491 351 L 492 362 L 499 363 L 515 363 L 531 362 L 540 361 L 540 349 L 541 335 L 541 321 L 529 320 Z"/>
-    <path class="state" data-state="MS" d="M 553 353 L 547 352 L 537 353 L 531 360 L 530 375 L 530 391 L 531 405 L 532 418 L 538 423 L 547 424 L 557 421 L 563 411 L 565 396 L 563 379 L 559 364 Z"/>
-    <path class="state" data-state="MT" d="M 237 135 L 220 130 L 200 126 L 180 128 L 163 134 L 154 147 L 156 162 L 168 171 L 185 175 L 200 176 L 207 166 L 221 159 L 238 154 L 258 152 L 280 151 L 302 151 L 318 147 L 322 136 L 315 127 L 297 123 L 274 122 Z"/>
-    <path class="state" data-state="NC" d="M 661 305 L 646 300 L 629 299 L 614 301 L 602 307 L 596 318 L 599 329 L 611 334 L 625 334 L 641 329 L 655 321 Z"/>
-    <path class="state" data-state="ND" d="M 378 143 L 375 163 L 374 184 L 374 206 L 378 218 L 400 219 L 428 218 L 456 217 L 470 212 L 471 192 L 469 170 L 463 152 L 453 141 L 430 138 L 406 137 Z"/>
-    <path class="state" data-state="NE" d="M 395 265 L 392 284 L 391 303 L 393 319 L 440 320 L 468 319 L 491 318 L 493 305 L 492 287 L 489 269 L 480 258 L 462 254 L 437 252 L 414 252 L 399 255 Z"/>
-    <path class="state" data-state="NH" d="M 766 175 L 759 170 L 752 176 L 750 190 L 752 204 L 758 209 L 765 202 L 768 188 Z"/>
-    <path class="state" data-state="NJ" d="M 738 235 L 730 230 L 723 236 L 722 249 L 723 262 L 729 268 L 737 265 L 743 256 L 743 244 Z"/>
-    <path class="state" data-state="NM" d="M 262 341 L 260 365 L 260 393 L 261 420 L 262 446 L 263 460 L 287 460 L 330 459 L 362 458 L 363 433 L 363 406 L 363 379 L 363 352 L 362 333 L 331 332 L 300 330 L 274 330 Z"/>
-    <path class="state" data-state="NV" d="M 175 240 L 165 261 L 156 284 L 148 308 L 144 334 L 145 360 L 151 381 L 161 397 L 172 405 L 185 406 L 198 400 L 210 385 L 218 364 L 223 340 L 224 315 L 222 289 L 216 265 L 207 247 L 194 234 Z"/>
-    <path class="state" data-state="NY" d="M 692 193 L 679 188 L 664 189 L 650 196 L 639 208 L 637 223 L 641 236 L 653 241 L 667 241 L 680 235 L 690 222 Z"/>
-    <path class="state" data-state="OH" d="M 621 254 L 610 249 L 598 251 L 588 260 L 583 274 L 583 290 L 586 304 L 594 312 L 605 314 L 616 311 L 624 301 L 627 287 L 626 270 Z"/>
-    <path class="state" data-state="OK" d="M 396 363 L 393 381 L 393 399 L 395 410 L 443 410 L 476 408 L 494 407 L 496 393 L 495 377 L 493 362 L 473 362 L 441 362 Z"/>
-    <path class="state" data-state="OR" d="M 121 188 L 110 198 L 103 215 L 100 238 L 102 261 L 110 280 L 122 292 L 138 295 L 156 295 L 173 298 L 188 295 L 200 284 L 207 267 L 210 248 L 208 228 L 202 210 L 192 196 L 178 188 L 160 183 L 140 182 Z"/>
-    <path class="state" data-state="PA" d="M 669 234 L 655 230 L 639 228 L 623 229 L 609 231 L 604 242 L 605 255 L 614 261 L 628 263 L 643 262 L 658 258 L 671 250 Z"/>
-    <path class="state" data-state="RI" d="M 760 221 L 753 218 L 749 224 L 751 233 L 758 234 Z"/>
-    <path class="state" data-state="SC" d="M 641 334 L 629 335 L 618 338 L 611 350 L 613 363 L 620 374 L 632 381 L 644 378 L 652 368 L 653 353 L 649 340 Z"/>
-    <path class="state" data-state="SD" d="M 376 218 L 375 238 L 375 259 L 376 272 L 396 273 L 426 272 L 457 270 L 472 265 L 472 247 L 470 226 L 467 213 L 455 217 L 427 218 L 400 219 Z"/>
-    <path class="state" data-state="TN" d="M 590 330 L 577 327 L 561 326 L 544 328 L 528 330 L 515 333 L 508 343 L 511 353 L 522 356 L 538 354 L 554 350 L 569 346 L 584 341 L 596 334 L 598 327 Z"/>
-    <path class="state" data-state="TX" d="M 364 362 L 362 385 L 362 409 L 365 432 L 370 456 L 376 479 L 383 499 L 393 514 L 407 521 L 423 522 L 439 515 L 450 502 L 456 486 L 458 467 L 459 447 L 461 427 L 464 406 L 465 384 L 466 362 L 443 362 L 414 362 L 386 362 Z"/>
-    <path class="state" data-state="UT" d="M 222 270 L 220 298 L 220 327 L 222 355 L 224 375 L 238 375 L 261 378 L 263 354 L 263 328 L 263 302 L 263 276 L 262 258 L 244 260 Z"/>
-    <path class="state" data-state="VA" d="M 675 273 L 662 270 L 649 269 L 637 272 L 626 278 L 619 288 L 621 299 L 631 304 L 644 304 L 657 300 L 669 292 Z"/>
-    <path class="state" data-state="VT" d="M 754 181 L 747 177 L 742 185 L 742 199 L 748 207 L 755 203 L 758 191 Z"/>
-    <path class="state" data-state="WA" d="M 113 137 L 103 146 L 99 163 L 102 181 L 111 193 L 124 197 L 140 196 L 158 192 L 173 186 L 179 173 L 176 157 L 166 145 L 150 136 L 132 132 Z"/>
-    <path class="state" data-state="WI" d="M 523 170 L 511 165 L 501 170 L 495 183 L 494 200 L 498 217 L 509 226 L 523 224 L 535 215 L 540 200 L 537 183 Z"/>
-    <path class="state" data-state="WV" d="M 645 263 L 634 260 L 623 263 L 615 273 L 613 286 L 616 299 L 625 307 L 637 307 L 648 298 L 652 285 L 649 272 Z"/>
-    <path class="state" data-state="WY" d="M 265 215 L 263 243 L 263 271 L 265 292 L 267 308 L 300 308 L 334 308 L 363 307 L 364 281 L 364 254 L 364 227 L 362 211 L 332 210 L 302 209 L 272 210 Z"/>
-
-    <!-- NO-TAX STATES -->
-    <path class="state" data-state="AK" d="M 152 505 L 142 498 L 128 498 L 116 505 L 110 517 L 113 530 L 124 537 L 138 535 L 150 526 Z"/>
-    <path class="state" data-state="DE" d="M 735 249 L 730 246 L 725 253 L 724 266 L 730 272 L 737 267 Z"/>
-    <path class="state" data-state="MT" d="M 237 135 L 220 130 L 200 126 L 180 128 L 163 134 L 154 147 L 156 162 L 168 171 L 185 175 L 200 176 L 207 166 L 221 159 L 238 154 L 258 152 L 280 151 L 302 151 L 318 147 L 322 136 L 315 127 L 297 123 L 274 122 Z"/>
-    <path class="state" data-state="NH" d="M 766 175 L 759 170 L 752 176 L 750 190 L 752 204 L 758 209 L 765 202 L 768 188 Z"/>
-    <path class="state" data-state="OR" d="M 121 188 L 110 198 L 103 215 L 100 238 L 102 261 L 110 280 L 122 292 L 138 295 L 156 295 L 173 298 L 188 295 L 200 284 L 207 267 L 210 248 L 208 228 L 202 210 L 192 196 L 178 188 L 160 183 L 140 182 Z"/>
-
-    <!-- INSET BOXES -->
-    <rect class="inset-box" x="65" y="465" width="160" height="115" rx="3"/>
-    <text x="70" y="476" font-size="7" fill="#888" font-family="Segoe UI,sans-serif">Alaska</text>
-    <rect class="inset-box" x="250" y="495" width="110" height="75" rx="3"/>
-    <text x="255" y="506" font-size="7" fill="#888" font-family="Segoe UI,sans-serif">Hawaii</text>
-
-    <!-- ALASKA inset -->
-    <path class="state" data-state="AK" d="M 152 505 L 142 498 L 128 498 L 116 505 L 110 517 L 113 530 L 124 537 L 138 535 L 150 526 Z"/>
-
-    <!-- HAWAII inset -->
-    <path class="state" data-state="HI" d="M 278 540 L 270 536 L 265 542 L 270 548 Z"/>
-    <path class="state" data-state="HI" d="M 298 533 L 288 529 L 283 535 L 291 540 Z"/>
-    <path class="state" data-state="HI" d="M 320 527 L 308 522 L 303 529 L 313 534 Z"/>
-    <path class="state" data-state="HI" d="M 344 521 L 330 516 L 325 524 L 337 529 Z"/>
-
-    <!-- State labels — contiguous -->
-    <text class="state-label" x="583" y="406" text-anchor="middle">AL</text>
-    <text class="state-label" x="514" y="375" text-anchor="middle">AR</text>
-    <text class="state-label" x="218" y="395" text-anchor="middle">AZ</text>
-    <text class="state-label" x="155" y="365" text-anchor="middle">CA</text>
-    <text class="state-label" x="320" y="320" text-anchor="middle">CO</text>
-    <text class="state-label" x="750" y="219" text-anchor="middle">CT</text>
-    <text class="state-label" x="711" y="281" text-anchor="middle">DC</text>
-    <text class="state-label" x="729" y="260" text-anchor="middle">DE</text>
-    <text class="state-label" x="588" y="490" text-anchor="middle">FL</text>
-    <text class="state-label" x="620" y="406" text-anchor="middle">GA</text>
-    <text class="state-label" x="130" y="519" text-anchor="middle">AK</text>
-    <text class="state-label" x="300" y="530" text-anchor="middle">HI</text>
-    <text class="state-label" x="490" y="290" text-anchor="middle">IA</text>
-    <text class="state-label" x="228" y="215" text-anchor="middle">ID</text>
-    <text class="state-label" x="529" y="307" text-anchor="middle">IL</text>
-    <text class="state-label" x="564" y="300" text-anchor="middle">IN</text>
-    <text class="state-label" x="440" y="335" text-anchor="middle">KS</text>
-    <text class="state-label" x="570" y="325" text-anchor="middle">KY</text>
-    <text class="state-label" x="516" y="428" text-anchor="middle">LA</text>
-    <text class="state-label" x="760" y="206" text-anchor="middle">MA</text>
-    <text class="state-label" x="692" y="281" text-anchor="middle">MD</text>
-    <text class="state-label" x="786" y="170" text-anchor="middle">ME</text>
-    <text class="state-label" x="551" y="193" text-anchor="middle">MI</text>
-    <text class="state-label" x="476" y="201" text-anchor="middle">MN</text>
-    <text class="state-label" x="516" y="342" text-anchor="middle">MO</text>
-    <text class="state-label" x="547" y="390" text-anchor="middle">MS</text>
-    <text class="state-label" x="240" y="151" text-anchor="middle">MT</text>
-    <text class="state-label" x="629" y="316" text-anchor="middle">NC</text>
-    <text class="state-label" x="421" y="180" text-anchor="middle">ND</text>
-    <text class="state-label" x="440" y="286" text-anchor="middle">NE</text>
-    <text class="state-label" x="757" y="191" text-anchor="middle">NH</text>
-    <text class="state-label" x="731" y="250" text-anchor="middle">NJ</text>
-    <text class="state-label" x="307" y="396" text-anchor="middle">NM</text>
-    <text class="state-label" x="180" y="325" text-anchor="middle">NV</text>
-    <text class="state-label" x="665" y="215" text-anchor="middle">NY</text>
-    <text class="state-label" x="603" y="282" text-anchor="middle">OH</text>
-    <text class="state-label" x="440" y="386" text-anchor="middle">OK</text>
-    <text class="state-label" x="153" y="240" text-anchor="middle">OR</text>
-    <text class="state-label" x="637" y="247" text-anchor="middle">PA</text>
-    <text class="state-label" x="754" y="228" text-anchor="middle">RI</text>
-    <text class="state-label" x="632" y="358" text-anchor="middle">SC</text>
-    <text class="state-label" x="421" y="246" text-anchor="middle">SD</text>
-    <text class="state-label" x="552" y="342" text-anchor="middle">TN</text>
-    <text class="state-label" x="415" y="445" text-anchor="middle">TX</text>
-    <text class="state-label" x="240" y="320" text-anchor="middle">UT</text>
-    <text class="state-label" x="747" y="193" text-anchor="middle">VT</text>
-    <text class="state-label" x="647" y="288" text-anchor="middle">VA</text>
-    <text class="state-label" x="134" y="163" text-anchor="middle">WA</text>
-    <text class="state-label" x="513" y="197" text-anchor="middle">WI</text>
-    <text class="state-label" x="632" y="285" text-anchor="middle">WV</text>
-    <text class="state-label" x="313" y="260" text-anchor="middle">WY</text>
-    </svg>
-
-    <div class="cmp-panel" id="cmp-panel" style="display:none">
-      <div class="cmp-head"><h3>State Comparison</h3><button class="clr-btn" id="clr-cmp">Clear All</button></div>
-      <div class="cmp-scroll">
-        <table class="cmp"><thead><tr><th>State</th><th>Revenue Threshold</th><th>Transaction Threshold</th><th>Rule</th><th>Dept. of Revenue</th><th></th></tr></thead>
-        <tbody id="cmp-tbody"></tbody></table>
+        <div class="pill" aria-live="polite">
+          <span>Selected:</span>
+          <strong id="selectedLabel">None</strong>
+        </div>
       </div>
+    </header>
+
+    <div class="grid">
+      <section class="card" aria-label="Map section">
+        <div id="errorHost" class="sr" aria-live="assertive"></div>
+        <div class="mapShell" id="mapShell">
+          <!-- The SVG gets injected here -->
+          <div id="mapHost" aria-label="Interactive map of the United States"></div>
+        </div>
+
+        <div id="comparePanel" class="compare" hidden aria-label="Compare panel">
+          <div class="compareTop">
+            <div class="title">Compare up to 3 states</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button id="clearCompare" class="btn secondary" type="button">Clear</button>
+              <span class="pill"><span>In compare:</span> <strong id="compareCount">0</strong></span>
+            </div>
+          </div>
+          <div class="tableWrap">
+            <table aria-label="Comparison table">
+              <thead>
+                <tr>
+                  <th>State</th>
+                  <th>Revenue threshold</th>
+                  <th>Transaction threshold</th>
+                  <th>Rule</th>
+                  <th>DOR link</th>
+                </tr>
+              </thead>
+              <tbody id="compareBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <footer>
+          <div>Informational only; verify with state sources.</div>
+          <div>Data last updated: <span id="dataLastUpdated">2026-02-24</span></div>
+        </footer>
+      </section>
     </div>
   </div>
 
-  <div class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="State details">
-    <div class="d-head" id="d-head">
-      <div><div class="d-abbr" id="d-abbr"></div><h2 id="d-name"></h2></div>
-      <button class="close-btn" id="close-d" aria-label="Close">✕</button>
+  <!-- Tooltip (screen-reader readable via aria-describedby on focus) -->
+  <div id="tooltip" class="tooltip" role="tooltip" aria-hidden="true"></div>
+
+  <!-- Drawer -->
+  <div id="drawerOverlay" class="drawerOverlay" tabindex="-1" aria-hidden="true"></div>
+  <aside id="drawer" class="drawer" aria-hidden="true" aria-label="State details panel">
+    <div class="drawerHeader">
+      <div>
+        <h2 id="drawerTitle">State</h2>
+        <div class="meta" id="drawerSubtitle">—</div>
+      </div>
+      <button class="iconBtn" id="closeDrawerBtn" type="button" aria-label="Close details">✕</button>
     </div>
-    <div class="d-body" id="d-body"></div>
-  </div>
-</main>
+    <div class="drawerBody" id="drawerBody"></div>
+  </aside>
 
-<div id="ov"></div>
-<div id="tip" role="tooltip" aria-live="polite"></div>
+  <script>
+    /******************************************************************
+     * 1) DATA (sample + clearly marked placeholders)
+     ******************************************************************/
+    const RULE_LABEL = {
+      REVENUE_ONLY: "Revenue only",
+      TRANSACTIONS_ONLY: "Transactions only",
+      REVENUE_OR_TRANSACTIONS: "Revenue OR Transactions",
+      REVENUE_AND_TRANSACTIONS: "Revenue AND Transactions",
+      NO_NEXUS: "Nexus does not apply"
+    };
 
-<footer><strong>Disclaimer:</strong> Informational only. Thresholds change — always verify with each state's Department of Revenue before making compliance decisions. Data reflects publicly available information as of the dates noted per state.</footer>
+    // States where general sales tax nexus often does not apply (informational).
+    // Keep/adjust as your policy requires.
+    const NO_NEXUS_STATES = new Set(["AK","DE","MT","NH","OR"]);
 
-<script>
-const D = {
-  "AL":{"name":"Alabama","abbr":"AL","revenueThreshold":250000,"transactionThreshold":null,"ruleType":"REVENUE_ONLY","notes":"Alabama adopted economic nexus via the Simplified Sellers Use Tax (SSUT) program.","lastUpdated":"2019-10-01","dorUrl":"https://www.revenue.alabama.gov/","sourceLabel":"Alabama Department of Revenue"},
-  "AK":{"name":"Alaska","abbr":"AK","revenueThreshold":100000,"transactionThreshold":200,"ruleType":"REVENUE_OR_TRANSACTIONS","notes":"No state sales tax, but the Alaska Remote Seller Sales Tax Commission (ARSSTC) sets economic nexus standards for local jurisdictions.","lastUpdated":"2020-01-06","dorUrl":"https://arsstc.org/","sourceLabel":"Alaska Remote Seller Sales Tax Commission","noTax":true},
-  "AZ":{"name":"Arizona","abbr":"AZ","revenueThreshold":100000,"transactionThreshold":null,"ruleType":"REVENUE_ONLY","notes":"Transaction threshold eliminated September 30, 2021.","lastUpdated":"2021-09-30","dorUrl":"https://azdor.gov/","sourceLabel":"Arizona Department of Revenue"},
-  "AR":{"name":"Arkansas","abbr":"AR","revenueThreshold":100000,"transactionThreshold":200,"ruleType":"REVENUE_OR_TRANSACTIONS","notes":"","lastUpdated":"2019-07-01","dorUrl":"https://www.dfa.arkansas.gov/","sourceLabel":"Arkansas Dept. of Finance & Administration"},
-  "CA":{"name":"California","abbr":"CA","revenueThreshold":500000,"transactionThreshold":null,"ruleType":"REVENUE_ONLY","notes":"Threshold is $500,000 in sales of tangible personal property. Transaction threshold removed.","lastUpdated":"2019-04-25","dorUrl":"https://www.cdtfa.ca.gov/","sourceLabel":"CA Dept. of Tax and Fee Administration"},
-  "CO":{"name":"Colorado","abbr":"CO","revenueThreshold":100000,"transactionThreshold":null,"ruleType":"REVENUE_ONLY","notes":"Transaction threshold eliminated October 1, 2019.","lastUpdated":"2019-10-01","dorUrl":"https://tax.colorado.gov/","sourceLabel":"Colorado Department of Revenue"},
-  "CT":{"name":"Connecticut","abbr":"CT","revenueThreshold":100000,"transactionThreshold":200,"ruleType":"REVENUE_AND_TRANSACTIONS","notes":"Both revenue AND transaction thresholds must be met.","lastUpdated":"2019-07-01","dorUrl":"https://portal.ct.gov/DRS","sourceLabel":"CT Department of Revenue Services"},
-  "DE":{"name":"Delaware","abbr":"DE","revenueThreshold":null,"transactionThreshold":null,"ruleType":"REVENUE_ONLY","notes":"Delaware has no general sales tax. Economic nexus thresholds are not applicable.","lastUpdated":"2024-01-01","dorUrl":"https://revenue.delaware.gov/","sourceLabel":"Delaware Division of Revenue","noTax":true},
-  "DC":{"name":"District of Columbia","abbr":"DC","revenueThreshold":100000,"transactionThreshold":200,"ruleType":"REVENUE_OR_TRANSACTIONS","notes":"","lastUpdated":"2019-01-01","dorUrl":"https://otr.cfo.dc.gov/","sourceLabel":"DC Office of Tax and Revenue"},
-  "FL":{"name":"Florida","abbr":"FL","revenueThreshold":100000,"transactionThreshold":null,"ruleType":"REVENUE_ONLY","notes":"Florida enacted economic nexus effective July 1, 2021. No transaction threshold.","lastUpdated":"2021-07-01","dorUrl":"https://floridarevenue.com/","sourceLabel":"Florida Department of Revenue"},
-  "GA":{"name":"Georgia","abbr":"GA","revenueThreshold":100000,"transactionThreshold":200,"ruleType":"REVENUE_OR_TRANSACTIONS","notes":"","lastUpdated":"2019-01-01","dorUrl":"https://dor.georgia.gov/","sourceLabel":"Georgia Department of Revenue"},
-  "HI":{"name":"Hawaii","abbr":"HI","revenueThreshold":100000,"transactionThreshold":200,"ruleType":"REVENUE_OR_TRANSACTIONS","notes":"Hawaii imposes a General Excise Tax (GET). Nexus standards apply to GET.","lastUpdated":"2018-07-01","dorUrl":"https://tax.hawaii.gov/","sourceLabel":"Hawaii Department of Taxation"},
-  "ID":{"name":"Idaho","abbr":"ID","revenueThreshold":100000,"transactionThreshold":null,"ruleType":"REVENUE_ONLY","notes":"","lastUpdated":"2018-06-01","dorUrl":"https://tax.idaho.gov/","sourceLabel":"Idaho State Tax Commission"},
-  "IL":{"name":"Illinois","abbr":"IL","revenueThreshold":100000,"transactionThreshold":200,"ruleType":"REVENUE_OR_TRANSACTIONS","notes":"Illinois distinguishes between origin-sourced and destination-sourced transactions, creating a complex compliance environment.","lastUpdated":"2019-10-01","dorUrl":"https://www2.illinois.gov/rev/","sourceLabel":"Illinois Department of Revenue"},
-  "IN":{"name":"Indiana","abbr":"IN","revenueThreshold":100000,"transactionThreshold":200,"ruleType":"REVENUE_OR_TRANSACTIONS","notes":"","lastUpdated":"2018-10-01","dorUrl":"https://www.in.gov/dor/","sourceLabel":"Indiana Department of Revenue"},
-  "IA":{"name":"Iowa","abbr":"IA","revenueThreshold":100000,"transactionThreshold":null,"ruleType":"REVENUE_ONLY","notes":"Iowa eliminated its 200-transaction threshold effective July 1, 2019.","lastUpdated":"2019-07-01","dorUrl":"https://tax.iowa.gov/","sourceLabel":"Iowa Department of Revenue"},
-  "KS":{"name":"Kansas","abbr":"KS","revenueThreshold":100000,"transactionThreshold":null,"ruleType":"REVENUE_ONLY","notes":"As of July 1, 2021, Kansas requires collection with no de minimis threshold; $100,000 threshold formalized January 1, 2023.","lastUpdated":"2023-01-01","dorUrl":"https://www.ksrevenue.gov/","sourceLabel":"Kansas Department of Revenue"},
-  "KY":{"name":"Kentucky","abbr":"KY","revenueThreshold":100000,"transactionThreshold":200,"ruleType":"REVENUE_OR_TRANSACTIONS","notes":"","lastUpdated":"2018-10-01","dorUrl":"https://revenue.ky.gov/","sourceLabel":"Kentucky Department of Revenue"},
-  "LA":{"name":"Louisiana","abbr":"LA","revenueThreshold":100000,"transactionThreshold":200,"ruleType":"REVENUE_OR_TRANSACTIONS","notes":"Louisiana's sales tax is administered at both state and local level.","lastUpdated":"2020-07-01","dorUrl":"https://revenue.louisiana.gov/","sourceLabel":"Louisiana Department of Revenue"},
-  "ME":{"name":"Maine","abbr":"ME","revenueThreshold":100000,"transactionThreshold":200,"ruleType":"REVENUE_OR_TRANSACTIONS","notes":"","lastUpdated":"2018-10-01","dorUrl":"https://www.maine.gov/revenue/","sourceLabel":"Maine Revenue Services"},
-  "MD":{"name":"Maryland","abbr":"MD","revenueThreshold":100000,"transactionThreshold":200,"ruleType":"REVENUE_OR_TRANSACTIONS","notes":"","lastUpdated":"2018-10-01","dorUrl":"https://www.marylandtaxes.gov/","sourceLabel":"Maryland Comptroller"},
-  "MA":{"name":"Massachusetts","abbr":"MA","revenueThreshold":100000,"transactionThreshold":null,"ruleType":"REVENUE_ONLY","notes":"Massachusetts eliminated its transaction threshold effective October 1, 2019.","lastUpdated":"2019-10-01","dorUrl":"https://www.mass.gov/orgs/massachusetts-department-of-revenue","sourceLabel":"Massachusetts Department of Revenue"},
-  "MI":{"name":"Michigan","abbr":"MI","revenueThreshold":100000,"transactionThreshold":200,"ruleType":"REVENUE_OR_TRANSACTIONS","notes":"","lastUpdated":"2018-10-01","dorUrl":"https://www.michigan.gov/taxes","sourceLabel":"Michigan Department of Treasury"},
-  "MN":{"name":"Minnesota","abbr":"MN","revenueThreshold":100000,"transactionThreshold":200,"ruleType":"REVENUE_OR_TRANSACTIONS","notes":"","lastUpdated":"2019-10-01","dorUrl":"https://www.revenue.state.mn.us/","sourceLabel":"Minnesota Department of Revenue"},
-  "MS":{"name":"Mississippi","abbr":"MS","revenueThreshold":250000,"transactionThreshold":null,"ruleType":"REVENUE_ONLY","notes":"Mississippi was an early adopter of economic nexus rules prior to the Wayfair decision.","lastUpdated":"2017-09-01","dorUrl":"https://www.dor.ms.gov/","sourceLabel":"Mississippi Department of Revenue"},
-  "MO":{"name":"Missouri","abbr":"MO","revenueThreshold":100000,"transactionThreshold":null,"ruleType":"REVENUE_ONLY","notes":"Missouri was the last state with a sales tax to enact economic nexus, effective January 1, 2023.","lastUpdated":"2023-01-01","dorUrl":"https://dor.mo.gov/","sourceLabel":"Missouri Department of Revenue"},
-  "MT":{"name":"Montana","abbr":"MT","revenueThreshold":null,"transactionThreshold":null,"ruleType":"REVENUE_ONLY","notes":"Montana has no general sales tax. Economic nexus thresholds are not applicable.","lastUpdated":"2024-01-01","dorUrl":"https://mtrevenue.gov/","sourceLabel":"Montana Department of Revenue","noTax":true},
-  "NE":{"name":"Nebraska","abbr":"NE","revenueThreshold":100000,"transactionThreshold":200,"ruleType":"REVENUE_OR_TRANSACTIONS","notes":"","lastUpdated":"2019-01-01","dorUrl":"https://revenue.nebraska.gov/","sourceLabel":"Nebraska Department of Revenue"},
-  "NV":{"name":"Nevada","abbr":"NV","revenueThreshold":100000,"transactionThreshold":200,"ruleType":"REVENUE_OR_TRANSACTIONS","notes":"","lastUpdated":"2019-10-01","dorUrl":"https://tax.nv.gov/","sourceLabel":"Nevada Department of Taxation"},
-  "NH":{"name":"New Hampshire","abbr":"NH","revenueThreshold":null,"transactionThreshold":null,"ruleType":"REVENUE_ONLY","notes":"New Hampshire has no general sales tax. Economic nexus thresholds are not applicable.","lastUpdated":"2024-01-01","dorUrl":"https://www.revenue.nh.gov/","sourceLabel":"NH Dept. of Revenue Administration","noTax":true},
-  "NJ":{"name":"New Jersey","abbr":"NJ","revenueThreshold":100000,"transactionThreshold":200,"ruleType":"REVENUE_OR_TRANSACTIONS","notes":"","lastUpdated":"2018-11-01","dorUrl":"https://www.state.nj.us/treasury/taxation/","sourceLabel":"New Jersey Division of Taxation"},
-  "NM":{"name":"New Mexico","abbr":"NM","revenueThreshold":100000,"transactionThreshold":null,"ruleType":"REVENUE_ONLY","notes":"New Mexico imposes a Gross Receipts Tax (GRT). Economic nexus standards apply to GRT.","lastUpdated":"2019-07-01","dorUrl":"https://www.tax.newmexico.gov/","sourceLabel":"NM Taxation & Revenue Department"},
-  "NY":{"name":"New York","abbr":"NY","revenueThreshold":500000,"transactionThreshold":100,"ruleType":"REVENUE_AND_TRANSACTIONS","notes":"Both thresholds must be met: $500,000 in sales AND 100+ transactions in New York.","lastUpdated":"2019-06-01","dorUrl":"https://www.tax.ny.gov/","sourceLabel":"NY Dept. of Taxation and Finance"},
-  "NC":{"name":"North Carolina","abbr":"NC","revenueThreshold":100000,"transactionThreshold":200,"ruleType":"REVENUE_OR_TRANSACTIONS","notes":"","lastUpdated":"2018-11-01","dorUrl":"https://www.ncdor.gov/","sourceLabel":"North Carolina Department of Revenue"},
-  "ND":{"name":"North Dakota","abbr":"ND","revenueThreshold":100000,"transactionThreshold":200,"ruleType":"REVENUE_OR_TRANSACTIONS","notes":"","lastUpdated":"2018-10-01","dorUrl":"https://www.tax.nd.gov/","sourceLabel":"ND Office of State Tax Commissioner"},
-  "OH":{"name":"Ohio","abbr":"OH","revenueThreshold":100000,"transactionThreshold":200,"ruleType":"REVENUE_OR_TRANSACTIONS","notes":"","lastUpdated":"2018-08-01","dorUrl":"https://tax.ohio.gov/","sourceLabel":"Ohio Department of Taxation"},
-  "OK":{"name":"Oklahoma","abbr":"OK","revenueThreshold":100000,"transactionThreshold":null,"ruleType":"REVENUE_ONLY","notes":"Oklahoma eliminated its transaction threshold effective November 1, 2019.","lastUpdated":"2018-07-01","dorUrl":"https://oklahoma.gov/tax.html","sourceLabel":"Oklahoma Tax Commission"},
-  "OR":{"name":"Oregon","abbr":"OR","revenueThreshold":null,"transactionThreshold":null,"ruleType":"REVENUE_ONLY","notes":"Oregon has no general sales tax. Economic nexus thresholds are not applicable.","lastUpdated":"2024-01-01","dorUrl":"https://www.oregon.gov/DOR/","sourceLabel":"Oregon Department of Revenue","noTax":true},
-  "PA":{"name":"Pennsylvania","abbr":"PA","revenueThreshold":100000,"transactionThreshold":null,"ruleType":"REVENUE_ONLY","notes":"Pennsylvania eliminated its transaction threshold effective July 1, 2019.","lastUpdated":"2019-07-01","dorUrl":"https://www.revenue.pa.gov/","sourceLabel":"Pennsylvania Department of Revenue"},
-  "RI":{"name":"Rhode Island","abbr":"RI","revenueThreshold":100000,"transactionThreshold":200,"ruleType":"REVENUE_OR_TRANSACTIONS","notes":"Rhode Island was an early adopter of economic nexus prior to the Wayfair decision.","lastUpdated":"2017-08-17","dorUrl":"https://www.ri.gov/taxation/","sourceLabel":"Rhode Island Division of Taxation"},
-  "SC":{"name":"South Carolina","abbr":"SC","revenueThreshold":100000,"transactionThreshold":null,"ruleType":"REVENUE_ONLY","notes":"","lastUpdated":"2018-11-01","dorUrl":"https://dor.sc.gov/","sourceLabel":"South Carolina Department of Revenue"},
-  "SD":{"name":"South Dakota","abbr":"SD","revenueThreshold":100000,"transactionThreshold":200,"ruleType":"REVENUE_OR_TRANSACTIONS","notes":"South Dakota v. Wayfair (2018) — the landmark Supreme Court case that established economic nexus — originated here.","lastUpdated":"2018-06-21","dorUrl":"https://dor.sd.gov/","sourceLabel":"South Dakota Department of Revenue"},
-  "TN":{"name":"Tennessee","abbr":"TN","revenueThreshold":100000,"transactionThreshold":null,"ruleType":"REVENUE_ONLY","notes":"Transaction threshold eliminated. Threshold based on prior-year or current-year sales.","lastUpdated":"2020-10-01","dorUrl":"https://www.tn.gov/revenue/","sourceLabel":"Tennessee Department of Revenue"},
-  "TX":{"name":"Texas","abbr":"TX","revenueThreshold":500000,"transactionThreshold":null,"ruleType":"REVENUE_ONLY","notes":"Texas threshold is $500,000 in gross revenue from sales of tangible personal property and services into Texas.","lastUpdated":"2019-10-01","dorUrl":"https://comptroller.texas.gov/","sourceLabel":"Texas Comptroller of Public Accounts"},
-  "UT":{"name":"Utah","abbr":"UT","revenueThreshold":100000,"transactionThreshold":200,"ruleType":"REVENUE_OR_TRANSACTIONS","notes":"","lastUpdated":"2019-01-01","dorUrl":"https://tax.utah.gov/","sourceLabel":"Utah State Tax Commission"},
-  "VT":{"name":"Vermont","abbr":"VT","revenueThreshold":100000,"transactionThreshold":200,"ruleType":"REVENUE_OR_TRANSACTIONS","notes":"","lastUpdated":"2018-07-01","dorUrl":"https://tax.vermont.gov/","sourceLabel":"Vermont Department of Taxes"},
-  "VA":{"name":"Virginia","abbr":"VA","revenueThreshold":100000,"transactionThreshold":200,"ruleType":"REVENUE_OR_TRANSACTIONS","notes":"","lastUpdated":"2019-07-01","dorUrl":"https://www.tax.virginia.gov/","sourceLabel":"Virginia Department of Taxation"},
-  "WA":{"name":"Washington","abbr":"WA","revenueThreshold":100000,"transactionThreshold":null,"ruleType":"REVENUE_ONLY","notes":"Washington eliminated its transaction threshold effective March 14, 2019.","lastUpdated":"2018-10-01","dorUrl":"https://dor.wa.gov/","sourceLabel":"Washington State Dept. of Revenue"},
-  "WV":{"name":"West Virginia","abbr":"WV","revenueThreshold":100000,"transactionThreshold":200,"ruleType":"REVENUE_OR_TRANSACTIONS","notes":"","lastUpdated":"2019-01-01","dorUrl":"https://tax.wv.gov/","sourceLabel":"West Virginia Tax Division"},
-  "WI":{"name":"Wisconsin","abbr":"WI","revenueThreshold":100000,"transactionThreshold":200,"ruleType":"REVENUE_OR_TRANSACTIONS","notes":"","lastUpdated":"2018-10-01","dorUrl":"https://www.revenue.wi.gov/","sourceLabel":"Wisconsin Department of Revenue"},
-  "WY":{"name":"Wyoming","abbr":"WY","revenueThreshold":100000,"transactionThreshold":200,"ruleType":"REVENUE_OR_TRANSACTIONS","notes":"","lastUpdated":"2019-02-01","dorUrl":"https://revenue.wyo.gov/","sourceLabel":"Wyoming Department of Revenue"}
-};
+    // Sample data (fill in the rest)
+    // IMPORTANT: Replace placeholders and verify with official sources.
+    const statesNexusData = {
+      "CA": {
+        name: "California", abbr: "CA",
+        revenueThreshold: 500000, revenueCurrency: "USD",
+        transactionThreshold: null,
+        ruleType: "REVENUE_ONLY",
+        notes: "",
+        lastUpdated: "2026-02-24",
+        dorUrl: "https://www.cdtfa.ca.gov/",
+        sourceLabel: "Department of Tax and Fee Administration"
+      },
+      "NY": {
+        name: "New York", abbr: "NY",
+        revenueThreshold: 500000, revenueCurrency: "USD",
+        transactionThreshold: 100,
+        ruleType: "REVENUE_AND_TRANSACTIONS",
+        notes: "",
+        lastUpdated: "2026-02-24",
+        dorUrl: "https://www.tax.ny.gov/",
+        sourceLabel: "Department of Taxation and Finance"
+      },
+      "TX": {
+        name: "Texas", abbr: "TX",
+        revenueThreshold: 500000, revenueCurrency: "USD",
+        transactionThreshold: null,
+        ruleType: "REVENUE_ONLY",
+        notes: "",
+        lastUpdated: "2026-02-24",
+        dorUrl: "https://comptroller.texas.gov/taxes/",
+        sourceLabel: "Comptroller of Public Accounts"
+      },
 
-const RULE_LABELS={REVENUE_ONLY:"Revenue Only",TRANSACTIONS_ONLY:"Transactions Only",REVENUE_OR_TRANSACTIONS:"Revenue OR Transactions",REVENUE_AND_TRANSACTIONS:"Revenue AND Transactions"};
-const RULE_CLS={REVENUE_ONLY:"p-rev",TRANSACTIONS_ONLY:"p-tr",REVENUE_OR_TRANSACTIONS:"p-or",REVENUE_AND_TRANSACTIONS:"p-and"};
-let selState=null,cmpMode=false,cmpStates=[];
-const fmt=n=>n==null?"None":"$"+n.toLocaleString("en-US");
-const fmtTx=n=>n==null?"None":n.toLocaleString("en-US")+" transactions";
-const isNoTax=a=>!!D[a]?.noTax;
+      // Example NO_NEXUS states
+      "OR": { name:"Oregon", abbr:"OR", revenueThreshold:null, revenueCurrency:"USD", transactionThreshold:null, ruleType:"NO_NEXUS", notes:"No general state sales tax.", lastUpdated:"2026-02-24", dorUrl:"https://www.oregon.gov/dor/", sourceLabel:"Department of Revenue" },
+      "NH": { name:"New Hampshire", abbr:"NH", revenueThreshold:null, revenueCurrency:"USD", transactionThreshold:null, ruleType:"NO_NEXUS", notes:"No general state sales tax.", lastUpdated:"2026-02-24", dorUrl:"https://www.revenue.nh.gov/", sourceLabel:"Department of Revenue Administration" },
+      "DE": { name:"Delaware", abbr:"DE", revenueThreshold:null, revenueCurrency:"USD", transactionThreshold:null, ruleType:"NO_NEXUS", notes:"No general state sales tax.", lastUpdated:"2026-02-24", dorUrl:"https://revenue.delaware.gov/", sourceLabel:"Division of Revenue" },
+      "MT": { name:"Montana", abbr:"MT", revenueThreshold:null, revenueCurrency:"USD", transactionThreshold:null, ruleType:"NO_NEXUS", notes:"No general state sales tax.", lastUpdated:"2026-02-24", dorUrl:"https://mtrevenue.gov/", sourceLabel:"Department of Revenue" },
+      "AK": { name:"Alaska", abbr:"AK", revenueThreshold:null, revenueCurrency:"USD", transactionThreshold:null, ruleType:"NO_NEXUS", notes:"No statewide sales tax (local taxes may apply).", lastUpdated:"2026-02-24", dorUrl:"https://www.commerce.alaska.gov/", sourceLabel:"State of Alaska" },
 
-// Apply nexus / no-tax classes and a11y attrs
-document.querySelectorAll("#us-map .state").forEach(p=>{
-  const abbr=p.getAttribute("data-state");
-  const s=D[abbr]; if(!s) return;
-  const noTax=isNoTax(abbr);
-  // Remove duplicate class assignment from HTML — ensure exactly one type class
-  p.classList.remove("nexus","no-tax");
-  p.classList.add(noTax?"no-tax":"nexus");
-  p.setAttribute("tabindex","0");
-  p.setAttribute("role","button");
-  p.setAttribute("aria-label",`${s.name}${noTax?" — No state sales tax, economic nexus not applicable":": "+fmt(s.revenueThreshold)+" revenue threshold"}`);
-  p.addEventListener("mouseenter",e=>showTip(e,abbr));
-  p.addEventListener("mousemove",moveTip);
-  p.addEventListener("mouseleave",hideTip);
-  p.addEventListener("click",()=>cmpMode?toggleCmp(abbr):openDrawer(abbr));
-  p.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();cmpMode?toggleCmp(abbr):openDrawer(abbr);}});
-});
+      // Placeholder for DC (fill in)
+      "DC": {
+        name: "District of Columbia", abbr: "DC",
+        revenueThreshold: 100000, revenueCurrency: "USD",
+        transactionThreshold: 200,
+        ruleType: "REVENUE_OR_TRANSACTIONS",
+        notes: "Example placeholder — verify.",
+        lastUpdated: "2026-02-24",
+        dorUrl: "https://otr.cfo.dc.gov/",
+        sourceLabel: "Office of Tax and Revenue"
+      }
+    };
 
-// TOOLTIP
-const tip=document.getElementById("tip");
-function showTip(e,abbr){
-  const s=D[abbr];if(!s)return;
-  const noTax=isNoTax(abbr);
-  tip.className=noTax?"no-tax-tip":"";
-  let h=`<strong>${s.name}</strong>`;
-  if(noTax){
-    h+=`<div style="margin-top:3px;color:#C8BFE0">⚠ No state sales tax</div><div style="font-size:.71rem;opacity:.7;margin-top:1px">Economic nexus does not apply</div>`;
-  } else {
-    if(s.revenueThreshold) h+=`<div>Revenue: ${fmt(s.revenueThreshold)}</div>`;
-    if(s.transactionThreshold) h+=`<div>Transactions: ${fmtTx(s.transactionThreshold)}</div>`;
-    h+=`<span class="badge">${RULE_LABELS[s.ruleType]}</span>`;
-  }
-  h+=`<div style="margin-top:5px;opacity:.4;font-size:.66rem">Updated ${s.lastUpdated}</div>`;
-  tip.innerHTML=h; moveTip(e); tip.classList.add("vis");
-}
-function moveTip(e){
-  const x=e.clientX+15,y=e.clientY+13,tw=tip.offsetWidth||220;
-  tip.style.left=((x+tw>window.innerWidth)?e.clientX-tw-10:x)+"px";
-  tip.style.top=y+"px";
-}
-function hideTip(){tip.classList.remove("vis");}
+    // Fill missing states with safe placeholders so UI never breaks.
+    const ALL_STATE_ABBRS = [
+      "AL","AK","AZ","AR","CA","CO","CT","DE","DC","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO",
+      "MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"
+    ];
 
-// DRAWER
-const drawer=document.getElementById("drawer"),ov=document.getElementById("ov"),mw=document.getElementById("map-wrap");
-function openDrawer(abbr){
-  const s=D[abbr];if(!s)return;
-  selState=abbr; updateSel();
-  const noTax=isNoTax(abbr);
-  document.getElementById("d-head").className="d-head "+(noTax?"no-tax-head":"nexus-head");
-  document.getElementById("d-name").textContent=s.name;
-  document.getElementById("d-abbr").textContent=s.abbr;
-  const inCmp=cmpStates.includes(abbr);
-  let html="";
-  if(noTax){
-    html+=`<div class="no-tax-box"><strong>⚠ No State Sales Tax</strong><br>${s.name} does not impose a general state sales tax. Economic nexus thresholds are <strong>not applicable</strong> at the state level.${s.notes?`<br><br>${s.notes}`:""}</div>`;
-  } else {
-    html+=`<div class="card"><h3>Economic Nexus Thresholds</h3>
-      <div class="row"><span class="lbl">Revenue Threshold</span><span class="val">${fmt(s.revenueThreshold)}</span></div>
-      <div class="row"><span class="lbl">Transaction Threshold</span><span class="val">${fmtTx(s.transactionThreshold)}</span></div>
-      <div class="row"><span class="lbl">Rule</span><span class="val"><span class="pill ${RULE_CLS[s.ruleType]}">${RULE_LABELS[s.ruleType]}</span></span></div>
-    </div>`;
-    if(s.notes) html+=`<div class="note-box">📝 ${s.notes}</div>`;
-  }
-  html+=`<a href="${s.dorUrl}" target="_blank" rel="noopener noreferrer" class="dor-btn${noTax?" purple":""}">🏛 ${s.sourceLabel} ↗</a>
-  <div class="dor-url">${s.dorUrl}</div>`;
-  if(!noTax) html+=`<button class="add-cmp${inCmp?" rem":""}" id="cmp-d-btn" onclick="toggleCmpFromDrawer('${abbr}')">${inCmp?"✓ Remove from Compare":"+ Add to Compare"}</button>`;
-  html+=`<div class="upd">Last updated: ${s.lastUpdated} · ${s.sourceLabel}</div>`;
-  document.getElementById("d-body").innerHTML=html;
-  drawer.classList.add("open"); ov.classList.add("vis");
-  if(window.innerWidth>768) mw.classList.add("drawer-open");
-  document.getElementById("close-d").focus();
-}
-function closeDrawer(){
-  drawer.classList.remove("open"); ov.classList.remove("vis");
-  mw.classList.remove("drawer-open");
-  selState=null; updateSel();
-}
-function toggleCmpFromDrawer(abbr){
-  toggleCmp(abbr);
-  const inCmp=cmpStates.includes(abbr);
-  const btn=document.getElementById("cmp-d-btn");
-  if(btn){btn.textContent=inCmp?"✓ Remove from Compare":"+ Add to Compare";btn.classList.toggle("rem",inCmp);}
-}
-document.getElementById("close-d").addEventListener("click",closeDrawer);
-ov.addEventListener("click",closeDrawer);
-document.addEventListener("keydown",e=>{if(e.key==="Escape")closeDrawer();});
+    const STATE_NAME_FALLBACK = {
+      AL:"Alabama", AZ:"Arizona", AR:"Arkansas", CO:"Colorado", CT:"Connecticut", FL:"Florida", GA:"Georgia", HI:"Hawaii", ID:"Idaho",
+      IL:"Illinois", IN:"Indiana", IA:"Iowa", KS:"Kansas", KY:"Kentucky", LA:"Louisiana", ME:"Maine", MD:"Maryland", MA:"Massachusetts",
+      MI:"Michigan", MN:"Minnesota", MS:"Mississippi", MO:"Missouri", NE:"Nebraska", NV:"Nevada", NJ:"New Jersey", NM:"New Mexico",
+      NC:"North Carolina", ND:"North Dakota", OH:"Ohio", OK:"Oklahoma", PA:"Pennsylvania", RI:"Rhode Island", SC:"South Carolina",
+      SD:"South Dakota", TN:"Tennessee", UT:"Utah", VT:"Vermont", VA:"Virginia", WA:"Washington", WV:"West Virginia", WI:"Wisconsin", WY:"Wyoming"
+    };
 
-function updateSel(){
-  document.querySelectorAll("#us-map .state").forEach(p=>{
-    const a=p.getAttribute("data-state");
-    p.classList.toggle("selected",a===selState);
-    p.classList.toggle("compare-sel",cmpStates.includes(a));
-  });
-}
+    for (const abbr of ALL_STATE_ABBRS) {
+      if (!statesNexusData[abbr]) {
+        statesNexusData[abbr] = {
+          name: STATE_NAME_FALLBACK[abbr] || abbr,
+          abbr,
+          revenueThreshold: 100000,          // placeholder
+          revenueCurrency: "USD",
+          transactionThreshold: 200,         // placeholder
+          ruleType: "REVENUE_OR_TRANSACTIONS",
+          notes: "Placeholder — fill in verified thresholds.",
+          lastUpdated: "2026-02-24",
+          dorUrl: "https://example.com",
+          sourceLabel: "Department of Revenue"
+        };
+      }
+      // If listed as NO_NEXUS, ensure ruleType
+      if (NO_NEXUS_STATES.has(abbr)) statesNexusData[abbr].ruleType = "NO_NEXUS";
+    }
 
-// SEARCH
-const srch=document.getElementById("srch"),acEl=document.getElementById("ac");
-let acIdx=-1;
-srch.addEventListener("input",()=>{
-  const q=srch.value.trim().toLowerCase(); acEl.innerHTML=""; acIdx=-1;
-  if(!q){acEl.style.display="none";return;}
-  const m=Object.values(D).filter(s=>s.name.toLowerCase().includes(q)||s.abbr.toLowerCase()===q).slice(0,8);
-  if(!m.length){acEl.style.display="none";return;}
-  m.forEach((s,i)=>{
-    const li=document.createElement("li");
-    li.setAttribute("role","option"); li.setAttribute("id",`ao${i}`);
-    li.innerHTML=`<span>${s.name}</span><span style="opacity:.4;font-size:.72rem">${s.abbr}</span>`;
-    li.addEventListener("mousedown",e=>{e.preventDefault();pickState(s.abbr);});
-    acEl.appendChild(li);
-  });
-  acEl.style.display="block";
-});
-srch.addEventListener("keydown",e=>{
-  const items=acEl.querySelectorAll("li");
-  if(e.key==="ArrowDown"){acIdx=Math.min(acIdx+1,items.length-1);hiAC(items);}
-  else if(e.key==="ArrowUp"){acIdx=Math.max(acIdx-1,-1);hiAC(items);}
-  else if(e.key==="Enter"){
-    const q=srch.value.trim().toLowerCase();
-    const matches=Object.values(D).filter(s=>s.name.toLowerCase().includes(q)||s.abbr.toLowerCase()===q);
-    if(acIdx>=0&&matches[acIdx]) pickState(matches[acIdx].abbr);
-    else if(matches[0]) pickState(matches[0].abbr);
-  } else if(e.key==="Escape"){acEl.style.display="none";}
-});
-function hiAC(items){items.forEach((li,i)=>li.classList.toggle("active",i===acIdx));}
-function pickState(abbr){srch.value=D[abbr]?.name||abbr;acEl.style.display="none";openDrawer(abbr);}
-document.addEventListener("click",e=>{if(!e.target.closest(".search-wrap"))acEl.style.display="none";});
+    /******************************************************************
+     * 2) MAP LOADING (single-file safe) + wiring interactivity
+     *
+     * We load an OSS SVG (state paths already defined) and inject it.
+     * This avoids big geometry blobs inside HTML, and avoids JS libs.
+     ******************************************************************/
+    const MAP_SVG_URL = "https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json";
+    // We do NOT use TopoJSON here to avoid libraries; instead we fetch a ready SVG:
+    // Use a stable CDN-hosted SVG with state IDs (postal abbreviations).
+    // If you have your own SVG, replace this URL with a self-hosted path.
+    const STATE_SVG_URL = "https://raw.githubusercontent.com/VictorCazanave/svg-maps/master/packages/usa/usa.svg";
 
-// COMPARE
-const cmpToggle=document.getElementById("cmp-toggle"),cmpCnt=document.getElementById("cmp-cnt"),cmpPanel=document.getElementById("cmp-panel"),cmpTbody=document.getElementById("cmp-tbody");
-cmpToggle.addEventListener("click",()=>{
-  cmpMode=!cmpMode;
-  cmpToggle.classList.toggle("active",cmpMode);
-  cmpToggle.setAttribute("aria-pressed",cmpMode);
-  if(cmpMode) closeDrawer();
-});
-document.getElementById("clr-cmp").addEventListener("click",()=>{cmpStates=[];updateSel();renderCmp();cmpCnt.style.display="none";});
-function toggleCmp(abbr){
-  const i=cmpStates.indexOf(abbr);
-  if(i>=0) cmpStates.splice(i,1);
-  else{if(cmpStates.length>=3)cmpStates.shift();cmpStates.push(abbr);}
-  updateSel(); renderCmp();
-  cmpCnt.textContent=cmpStates.length;
-  cmpCnt.style.display=cmpStates.length>0?"inline":"none";
-}
-function renderCmp(){
-  if(!cmpStates.length){cmpPanel.style.display="none";return;}
-  cmpPanel.style.display="block";
-  cmpTbody.innerHTML=cmpStates.map(abbr=>{
-    const s=D[abbr];if(!s)return"";
-    const noTax=isNoTax(abbr);
-    return `<tr>
-      <td><strong>${s.name}</strong> <span style="color:#999">(${s.abbr})</span></td>
-      <td>${noTax?"<em>No sales tax</em>":fmt(s.revenueThreshold)}</td>
-      <td>${noTax?"—":fmtTx(s.transactionThreshold)}</td>
-      <td>${noTax?"—":`<span class="pill ${RULE_CLS[s.ruleType]}">${RULE_LABELS[s.ruleType]}</span>`}</td>
-      <td><a href="${s.dorUrl}" target="_blank" rel="noopener noreferrer">${s.sourceLabel}</a></td>
-      <td><button class="rm-row" onclick="rmCmp('${abbr}')" aria-label="Remove ${s.name}">✕</button></td>
-    </tr>`;
-  }).join("");
-}
-function rmCmp(abbr){cmpStates=cmpStates.filter(a=>a!==abbr);updateSel();renderCmp();cmpCnt.textContent=cmpStates.length;cmpCnt.style.display=cmpStates.length>0?"inline":"none";}
-</script>
+    const mapHost = document.getElementById("mapHost");
+    const tooltip = document.getElementById("tooltip");
+    const drawer = document.getElementById("drawer");
+    const drawerOverlay = document.getElementById("drawerOverlay");
+    const drawerTitle = document.getElementById("drawerTitle");
+    const drawerSubtitle = document.getElementById("drawerSubtitle");
+    const drawerBody = document.getElementById("drawerBody");
+    const closeDrawerBtn = document.getElementById("closeDrawerBtn");
+    const selectedLabel = document.getElementById("selectedLabel");
+    const errorHost = document.getElementById("errorHost");
+    const dataLastUpdated = document.getElementById("dataLastUpdated");
+
+    const compareToggle = document.getElementById("compareToggle");
+    const comparePanel = document.getElementById("comparePanel");
+    const compareBody = document.getElementById("compareBody");
+    const compareCount = document.getElementById("compareCount");
+    const clearCompare = document.getElementById("clearCompare");
+
+    const searchInput = document.getElementById("searchInput");
+
+    let selectedAbbr = null;
+    let compareMode = false;
+    let compareList = []; // up to 3
+    let stateElementsByAbbr = new Map();
+
+    function fmtMoney(n){
+      if (n == null) return "—";
+      const s = Number(n).toLocaleString("en-US");
+      return "$" + s;
+    }
+    function fmtTx(n){
+      if (n == null) return "—";
+      return Number(n).toLocaleString("en-US");
+    }
+
+    function computeOverallLastUpdated(){
+      let latest = "1900-01-01";
+      for (const abbr of ALL_STATE_ABBRS){
+        const d = statesNexusData[abbr]?.lastUpdated;
+        if (d && d > latest) latest = d;
+      }
+      return latest;
+    }
+    dataLastUpdated.textContent = computeOverallLastUpdated();
+
+    function setError(msg){
+      console.error(msg);
+      const banner = document.createElement("div");
+      banner.className = "errorBanner";
+      banner.textContent = msg;
+      mapHost.innerHTML = "";
+      mapHost.appendChild(banner);
+      errorHost.textContent = msg;
+    }
+
+    async function loadSvg(){
+      try{
+        const res = await fetch(STATE_SVG_URL, { cache: "force-cache" });
+        if (!res.ok) throw new Error("SVG fetch failed: " + res.status);
+        const text = await res.text();
+
+        // Parse SVG
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(text, "image/svg+xml");
+        const svg = doc.documentElement;
+
+        // Add a hover gradient to the svg defs
+        const defs = doc.createElementNS("http://www.w3.org/2000/svg","defs");
+        defs.innerHTML = `
+          <linearGradient id="hoverGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="${getComputedStyle(document.documentElement).getPropertyValue('--silk').trim() || '#BFD2E8'}"/>
+            <stop offset="35%" stop-color="${getComputedStyle(document.documentElement).getPropertyValue('--moonstone').trim() || '#6FA7D8'}"/>
+            <stop offset="70%" stop-color="${getComputedStyle(document.documentElement).getPropertyValue('--gulf').trim() || '#5C97CE'}"/>
+            <stop offset="100%" stop-color="${getComputedStyle(document.documentElement).getPropertyValue('--teal').trim() || '#C8E7E3'}"/>
+          </linearGradient>
+        `;
+        svg.insertBefore(defs, svg.firstChild);
+
+        // Ensure responsive viewBox
+        if (!svg.getAttribute("viewBox") && svg.getAttribute("width") && svg.getAttribute("height")){
+          svg.setAttribute("viewBox", `0 0 ${svg.getAttribute("width")} ${svg.getAttribute("height")}`);
+        }
+        svg.removeAttribute("width");
+        svg.removeAttribute("height");
+        svg.setAttribute("preserveAspectRatio","xMidYMid meet");
+
+        // Inject into page (adoptNode)
+        const injected = document.importNode(svg, true);
+        mapHost.innerHTML = "";
+        mapHost.appendChild(injected);
+
+        wireStates(injected);
+      } catch (e){
+        setError("Map failed to load. Check network access or replace STATE_SVG_URL with your own hosted SVG. (" + e.message + ")");
+      }
+    }
+
+    function normalizeAbbr(s){
+      return (s || "").trim().toUpperCase();
+    }
+
+    function getStateData(abbr){
+      const d = statesNexusData[abbr];
+      if (!d) return null;
+      const isNo = d.ruleType === "NO_NEXUS" || NO_NEXUS_STATES.has(abbr);
+      return { ...d, isNoNexus: isNo };
+    }
+
+    function tooltipHtml(abbr){
+      const d = getStateData(abbr);
+      if (!d) return `<div class="tTitle">${abbr}</div><div>Missing data</div>`;
+
+      if (d.isNoNexus){
+        return `
+          <div class="tTitle">${d.name}</div>
+          <div class="tRow"><div class="tKey">Status</div><div class="tVal">${RULE_LABEL.NO_NEXUS}</div></div>
+          <div class="tRow"><div class="tKey">Notes</div><div class="tVal">${escapeHtml(d.notes || "N/A")}</div></div>
+          <div class="tRow"><div class="tKey">Last updated</div><div class="tVal">${escapeHtml(d.lastUpdated || "—")}</div></div>
+        `;
+      }
+
+      return `
+        <div class="tTitle">${d.name}</div>
+        <div class="tRow"><div class="tKey">Revenue</div><div class="tVal">${fmtMoney(d.revenueThreshold)}</div></div>
+        <div class="tRow"><div class="tKey">Transactions</div><div class="tVal">${d.transactionThreshold == null ? "—" : fmtTx(d.transactionThreshold)}</div></div>
+        <div class="tRow"><div class="tKey">Rule</div><div class="tVal">${escapeHtml(RULE_LABEL[d.ruleType] || d.ruleType)}</div></div>
+        ${d.notes ? `<div class="tRow"><div class="tKey">Notes</div><div class="tVal">${escapeHtml(d.notes)}</div></div>` : ``}
+        <div class="tRow"><div class="tKey">Last updated</div><div class="tVal">${escapeHtml(d.lastUpdated || "—")}</div></div>
+      `;
+    }
+
+    function openDrawer(abbr){
+      const d = getStateData(abbr);
+      if (!d) return;
+
+      selectedAbbr = abbr;
+      selectedLabel.textContent = `${d.name} (${abbr})`;
+
+      // Update map selection class
+      for (const [a, el] of stateElementsByAbbr.entries()){
+        el.classList.toggle("selected", a === abbr);
+      }
+
+      drawerTitle.textContent = `${d.name} (${abbr})`;
+      drawerSubtitle.textContent = d.isNoNexus ? RULE_LABEL.NO_NEXUS : (RULE_LABEL[d.ruleType] || d.ruleType);
+
+      const dorSafe = d.dorUrl || "#";
+      const dorText = d.dorUrl || "—";
+
+      let body = "";
+
+      if (d.isNoNexus){
+        body += `<div class="note"><strong>Nexus does not apply here</strong><div style="margin-top:6px;">${escapeHtml(d.notes || "No general state sales tax.")}</div></div>`;
+      }
+
+      body += `
+        <div class="kv">
+          <div class="row"><div class="k">Revenue threshold</div><div class="v">${d.isNoNexus ? "—" : fmtMoney(d.revenueThreshold)}</div></div>
+          <div class="row"><div class="k">Transaction threshold</div><div class="v">${d.isNoNexus ? "—" : (d.transactionThreshold == null ? "—" : fmtTx(d.transactionThreshold))}</div></div>
+          <div class="row"><div class="k">Rule</div><div class="v">${escapeHtml(drawerSubtitle.textContent)}</div></div>
+          ${d.effectiveTiming ? `<div class="row"><div class="k">Timing</div><div class="v">${escapeHtml(d.effectiveTiming)}</div></div>` : ``}
+          <div class="row"><div class="k">Last updated</div><div class="v">${escapeHtml(d.lastUpdated || "—")}</div></div>
+        </div>
+      `;
+
+      if (d.notes && !d.isNoNexus){
+        body += `<div class="kv"><div style="font-weight:800;margin-bottom:6px;">Notes</div><div style="color:var(--muted);font-size:13px;line-height:1.35;">${escapeHtml(d.notes)}</div></div>`;
+      }
+
+      body += `
+        <div class="kv">
+          <div style="font-weight:800;margin-bottom:8px;">State source</div>
+          <div class="linkRow">
+            <a class="linkBtn" href="${escapeAttr(dorSafe)}" target="_blank" rel="noopener noreferrer">Open DOR</a>
+            <div class="monoUrl">${escapeHtml(dorText)}</div>
+          </div>
+          <div style="margin-top:8px;color:var(--muted);font-size:12px;">Source label: ${escapeHtml(d.sourceLabel || "Department of Revenue")}</div>
+        </div>
+      `;
+
+      drawerBody.innerHTML = body;
+
+      drawer.classList.add("open");
+      drawerOverlay.classList.add("open");
+      drawer.setAttribute("aria-hidden","false");
+      drawerOverlay.setAttribute("aria-hidden","false");
+
+      // focus close button for accessibility
+      closeDrawerBtn.focus({ preventScroll: true });
+    }
+
+    function closeDrawer(){
+      drawer.classList.remove("open");
+      drawerOverlay.classList.remove("open");
+      drawer.setAttribute("aria-hidden","true");
+      drawerOverlay.setAttribute("aria-hidden","true");
+    }
+
+    function showTooltipAt(x,y, html){
+      tooltip.innerHTML = html;
+      tooltip.classList.add("show");
+      tooltip.setAttribute("aria-hidden","false");
+
+      // keep inside viewport
+      const pad = 14;
+      const rect = tooltip.getBoundingClientRect();
+      let left = x + 14;
+      let top = y + 14;
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+
+      if (left + rect.width + pad > vw) left = x - rect.width - 14;
+      if (top + rect.height + pad > vh) top = y - rect.height - 14;
+      left = Math.max(pad, left);
+      top = Math.max(pad, top);
+
+      tooltip.style.left = left + "px";
+      tooltip.style.top = top + "px";
+    }
+
+    function hideTooltip(){
+      tooltip.classList.remove("show");
+      tooltip.setAttribute("aria-hidden","true");
+    }
+
+    function toggleCompareMode(){
+      compareMode = !compareMode;
+      compareToggle.setAttribute("aria-pressed", String(compareMode));
+      compareToggle.textContent = compareMode ? "Compare: On" : "Compare: Off";
+      comparePanel.hidden = !compareMode;
+
+      if (!compareMode){
+        // leaving compare mode doesn't clear selection automatically
+        renderCompare();
+      }
+    }
+
+    function addToCompare(abbr){
+      const d = getStateData(abbr);
+      if (!d) return;
+
+      if (compareList.includes(abbr)){
+        compareList = compareList.filter(x => x !== abbr);
+      } else {
+        if (compareList.length >= 3) return;
+        compareList.push(abbr);
+      }
+      renderCompare();
+    }
+
+    function renderCompare(){
+      compareCount.textContent = String(compareList.length);
+
+      // Update map visual: mark compare states as selected outline (keep current selected fill)
+      for (const [a, el] of stateElementsByAbbr.entries()){
+        const inCompare = compareList.includes(a);
+        el.style.strokeWidth = el.classList.contains("selected") ? "" : (inCompare ? "1.6" : "");
+        el.style.stroke = el.classList.contains("selected") ? "" : (inCompare ? "rgba(31,27,58,.75)" : "");
+      }
+
+      compareBody.innerHTML = compareList.map(abbr => {
+        const d = getStateData(abbr);
+        const dor = d?.dorUrl || "#";
+        const rule = d?.isNoNexus ? RULE_LABEL.NO_NEXUS : (RULE_LABEL[d?.ruleType] || d?.ruleType || "—");
+        return `
+          <tr>
+            <td><strong>${escapeHtml(d?.name || abbr)}</strong> (${abbr})</td>
+            <td>${d?.isNoNexus ? "—" : fmtMoney(d?.revenueThreshold)}</td>
+            <td>${d?.isNoNexus ? "—" : (d?.transactionThreshold == null ? "—" : fmtTx(d.transactionThreshold))}</td>
+            <td>${escapeHtml(rule)}</td>
+            <td>
+              <a href="${escapeAttr(dor)}" target="_blank" rel="noopener noreferrer">DOR</a>
+              <div class="monoUrl">${escapeHtml(dor)}</div>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function wireStates(svgRoot){
+      // This SVG uses IDs like "CA", "TX", etc. We attach behavior to all matching paths.
+      stateElementsByAbbr.clear();
+
+      // Find any element with id matching a state abbreviation
+      for (const abbr of ALL_STATE_ABBRS){
+        const el = svgRoot.querySelector(`#${CSS.escape(abbr)}`);
+        if (!el) continue;
+
+        el.classList.add("state");
+        const d = getStateData(abbr);
+        if (d?.isNoNexus) el.classList.add("noNexus");
+
+        // Keyboard focusable and ARIA
+        el.setAttribute("tabindex","0");
+        el.setAttribute("role","button");
+        el.setAttribute("aria-label", `${d?.name || abbr} (${abbr})`);
+        el.setAttribute("data-abbr", abbr);
+
+        // Events
+        el.addEventListener("mousemove", (ev) => {
+          const html = tooltipHtml(abbr);
+          showTooltipAt(ev.clientX, ev.clientY, html);
+        });
+
+        el.addEventListener("mouseenter", (ev) => {
+          const html = tooltipHtml(abbr);
+          showTooltipAt(ev.clientX, ev.clientY, html);
+        });
+
+        el.addEventListener("mouseleave", () => hideTooltip());
+
+        el.addEventListener("focus", () => {
+          // Position tooltip near element
+          const r = el.getBoundingClientRect();
+          const html = tooltipHtml(abbr);
+          showTooltipAt(r.left + r.width/2, r.top + r.height/2, html);
+        });
+
+        el.addEventListener("blur", () => hideTooltip());
+
+        el.addEventListener("click", () => {
+          if (compareMode){
+            addToCompare(abbr);
+            return;
+          }
+          openDrawer(abbr);
+        });
+
+        el.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " "){
+            e.preventDefault();
+            if (compareMode) addToCompare(abbr);
+            else openDrawer(abbr);
+          } else if (e.key === "Escape"){
+            closeDrawer();
+          }
+        });
+
+        stateElementsByAbbr.set(abbr, el);
+      }
+
+      // If map didn't contain expected IDs
+      if (stateElementsByAbbr.size < 40){
+        setError("The loaded SVG did not contain expected state IDs. Replace STATE_SVG_URL with an SVG whose state paths have IDs like 'CA', 'TX', etc.");
+        return;
+      }
+
+      // Set initial label
+      selectedLabel.textContent = "None";
+
+      // Global interactions
+      drawerOverlay.addEventListener("click", closeDrawer);
+      closeDrawerBtn.addEventListener("click", closeDrawer);
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeDrawer();
+      });
+
+      // Compare controls
+      compareToggle.addEventListener("click", toggleCompareMode);
+      clearCompare.addEventListener("click", () => {
+        compareList = [];
+        renderCompare();
+      });
+
+      // Search (type name or abbr)
+      searchInput.addEventListener("input", () => {
+        const q = (searchInput.value || "").trim();
+        if (!q) return;
+
+        const qU = q.toUpperCase();
+        let abbr = null;
+
+        if (qU.length === 2 && statesNexusData[qU]) abbr = qU;
+        if (!abbr && qU === "D.C.") abbr = "DC";
+        if (!abbr && qU === "WASHINGTON DC") abbr = "DC";
+        if (!abbr){
+          // match by name
+          for (const a of ALL_STATE_ABBRS){
+            const d = statesNexusData[a];
+            if (!d) continue;
+            if (d.name.toUpperCase() === qU) { abbr = a; break; }
+          }
+        }
+
+        // partial match (autocomplete-ish): first that startsWith
+        if (!abbr){
+          const qClean = qU.replace(/\./g,"");
+          for (const a of ALL_STATE_ABBRS){
+            const d = statesNexusData[a];
+            if (!d) continue;
+            if (d.name.toUpperCase().startsWith(qClean) || a.startsWith(qClean)){
+              abbr = a; break;
+            }
+          }
+        }
+
+        if (abbr){
+          // Open drawer and also focus the state on map
+          openDrawer(abbr);
+          const el = stateElementsByAbbr.get(abbr);
+          if (el) el.focus({ preventScroll: true });
+        }
+      });
+    }
+
+    function escapeHtml(s){
+      return String(s ?? "").replace(/[&<>"']/g, c => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+      }[c]));
+    }
+    function escapeAttr(s){
+      return escapeHtml(s).replace(/"/g, "&quot;");
+    }
+
+    // Boot
+    loadSvg();
+  </script>
 </body>
 </html>
