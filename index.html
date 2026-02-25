@@ -1,0 +1,1247 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Economic Nexus Thresholds by State</title>
+    <style>
+      :root{
+        /* Brand colors (tasteful approximations) */
+        --tufts-blue: #3E7BB6; /* primary */
+        --alabaster: #F6F3EE;  /* background */
+        --haiti: #1F1B3A;      /* text/headings */
+
+        /* Transition palette (subtle hover/focus accents) */
+        --silk-blue: #D7E7F7;
+        --faded-blue: #BFD6F0;
+        --blue-koi: #7EA9D6;
+        --moonstone-blue: #69A7B8;
+        --gulfstream: #7BC3BD;
+        --neptune: #6AB2A6;
+        --pale-teal: #CBECE7;
+
+        --card: #FFFFFF;
+        --border: rgba(31,27,58,0.14);
+        --shadow: 0 10px 30px rgba(31,27,58,0.12);
+        --shadow-soft: 0 8px 20px rgba(31,27,58,0.10);
+        --radius: 16px;
+
+        --focus: #1F1B3A;
+      }
+
+      *{box-sizing:border-box}
+      html,body{height:100%}
+      body{
+        margin:0;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+        background: var(--alabaster);
+        color: var(--haiti);
+      }
+
+      a{color: var(--tufts-blue)}
+      a:focus-visible, button:focus-visible, input:focus-visible{
+        outline: 3px solid var(--focus);
+        outline-offset: 2px;
+        border-radius: 10px;
+      }
+
+      .page{
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 22px 16px 28px;
+      }
+
+      header{
+        display:flex;
+        flex-direction:column;
+        gap: 8px;
+        margin-bottom: 14px;
+      }
+      h1{
+        margin:0;
+        font-size: clamp(22px, 2.6vw, 34px);
+        letter-spacing: -0.02em;
+      }
+      .subtitle{
+        margin:0;
+        max-width: 78ch;
+        line-height: 1.4;
+        color: rgba(31,27,58,0.80);
+        font-size: 14px;
+      }
+
+      .controls{
+        display:flex;
+        gap: 10px;
+        align-items:center;
+        flex-wrap:wrap;
+        background: rgba(255,255,255,0.7);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 12px;
+        box-shadow: var(--shadow-soft);
+      }
+
+      .searchWrap{
+        flex: 1 1 280px;
+        display:flex;
+        gap: 10px;
+        align-items:center;
+      }
+      .searchLabel{
+        font-weight: 650;
+        font-size: 13px;
+      }
+      input[type="text"]{
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: 1px solid rgba(31,27,58,0.22);
+        background: #fff;
+        color: var(--haiti);
+        font-size: 14px;
+      }
+      .toggle{
+        display:flex;
+        align-items:center;
+        gap: 10px;
+        padding: 8px 10px;
+        border-radius: 12px;
+        border: 1px solid rgba(31,27,58,0.22);
+        background: #fff;
+      }
+      .toggle span{
+        font-size: 13px;
+        font-weight: 650;
+      }
+      .toggle input{ transform: scale(1.1); }
+
+      .content{
+        margin-top: 14px;
+        display:grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+        position: relative;
+      }
+
+      .mapCard{
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 12px;
+        overflow:hidden;
+      }
+      .mapWrap{
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        width:100%;
+        min-height: clamp(320px, 58vh, 640px);
+        position: relative;
+      }
+
+      .legendRow{
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap: 10px;
+        padding: 0 4px 10px;
+        color: rgba(31,27,58,0.72);
+        font-size: 12.5px;
+      }
+      .kbd{
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        border: 1px solid rgba(31,27,58,0.25);
+        border-bottom-width: 2px;
+        padding: 2px 6px;
+        border-radius: 8px;
+        background: rgba(246,243,238,0.9);
+        color: rgba(31,27,58,0.85);
+      }
+
+      /* Tooltip */
+      .tooltip{
+        position: fixed;
+        z-index: 50;
+        pointer-events:none;
+        max-width: 320px;
+        background: #ffffff;
+        border: 1px solid rgba(31,27,58,0.18);
+        box-shadow: var(--shadow-soft);
+        border-radius: 12px;
+        padding: 10px 12px;
+        font-size: 12.5px;
+        line-height: 1.35;
+        color: var(--haiti);
+      }
+      .tooltipTitle{
+        font-weight: 800;
+        margin-bottom: 4px;
+        letter-spacing: -0.01em;
+      }
+      .tooltipRow{
+        display:flex;
+        gap: 6px;
+        flex-wrap:wrap;
+        color: rgba(31,27,58,0.92);
+      }
+      .pill{
+        display:inline-flex;
+        align-items:center;
+        padding: 2px 8px;
+        border-radius: 999px;
+        border: 1px solid rgba(31,27,58,0.16);
+        background: rgba(215,231,247,0.45);
+        font-size: 12px;
+      }
+      .muted{ color: rgba(31,27,58,0.72); }
+
+      /* Drawer / overlay */
+      .overlay{
+        position: fixed;
+        inset: 0;
+        background: rgba(31,27,58,0.35);
+        z-index: 60;
+        display:flex;
+        justify-content:flex-end;
+      }
+      .drawer{
+        width: min(420px, 92vw);
+        height: 100%;
+        background: #fff;
+        border-left: 1px solid rgba(31,27,58,0.16);
+        box-shadow: var(--shadow);
+        padding: 14px;
+        display:flex;
+        flex-direction:column;
+        gap: 12px;
+      }
+      .drawerHeader{
+        display:flex;
+        align-items:flex-start;
+        justify-content:space-between;
+        gap: 10px;
+      }
+      .drawerTitle{
+        margin: 0;
+        font-size: 18px;
+        letter-spacing: -0.01em;
+      }
+      .abbr{
+        display:inline-block;
+        margin-left: 8px;
+        font-weight: 800;
+        color: rgba(31,27,58,0.75);
+        font-size: 13px;
+        border: 1px solid rgba(31,27,58,0.18);
+        border-radius: 10px;
+        padding: 2px 8px;
+        background: rgba(246,243,238,0.8);
+      }
+      .closeBtn{
+        border: 1px solid rgba(31,27,58,0.18);
+        background: rgba(246,243,238,0.9);
+        color: var(--haiti);
+        border-radius: 12px;
+        padding: 8px 10px;
+        cursor:pointer;
+        font-weight: 750;
+      }
+
+      .detailGrid{
+        display:grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+        border: 1px solid rgba(31,27,58,0.12);
+        border-radius: 14px;
+        padding: 12px;
+        background: rgba(215,231,247,0.22);
+      }
+      .detailRow{
+        display:flex;
+        justify-content:space-between;
+        gap: 10px;
+        font-size: 13px;
+      }
+      .detailRow strong{ font-weight: 800; }
+      .notes{
+        font-size: 13px;
+        line-height: 1.45;
+        color: rgba(31,27,58,0.84);
+        border-left: 3px solid rgba(62,123,182,0.6);
+        padding-left: 10px;
+        margin-top: 2px;
+      }
+
+      .btnRow{
+        display:flex;
+        gap: 10px;
+        flex-wrap:wrap;
+      }
+      .primaryBtn{
+        background: var(--tufts-blue);
+        color: var(--alabaster);
+        border: 1px solid rgba(0,0,0,0.08);
+        border-radius: 14px;
+        padding: 10px 12px;
+        cursor:pointer;
+        font-weight: 800;
+        text-decoration:none;
+        display:inline-flex;
+        align-items:center;
+        gap: 8px;
+      }
+      .secondaryBtn{
+        background: #fff;
+        color: var(--haiti);
+        border: 1px solid rgba(31,27,58,0.22);
+        border-radius: 14px;
+        padding: 10px 12px;
+        cursor:pointer;
+        font-weight: 800;
+      }
+      .urlBox{
+        font-size: 12.5px;
+        color: rgba(31,27,58,0.72);
+        word-break: break-all;
+      }
+
+      /* Compare */
+      .compareCard{
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 12px;
+      }
+      .compareHeader{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+      .compareHeader h2{
+        margin:0;
+        font-size: 15px;
+        letter-spacing: -0.01em;
+      }
+      .compareHint{
+        font-size: 12.5px;
+        color: rgba(31,27,58,0.72);
+      }
+      table{
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+      th, td{
+        padding: 10px 8px;
+        border-top: 1px solid rgba(31,27,58,0.12);
+        vertical-align: top;
+        text-align:left;
+      }
+      th{
+        color: rgba(31,27,58,0.75);
+        font-weight: 850;
+        font-size: 12px;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+      }
+
+      footer{
+        margin-top: 14px;
+        padding: 14px 2px 0;
+        color: rgba(31,27,58,0.74);
+        font-size: 12.5px;
+        display:flex;
+        justify-content:space-between;
+        gap: 10px;
+        flex-wrap:wrap;
+      }
+
+      /* SVG map styling */
+      svg{
+        width: 100%;
+        height: auto;
+        max-width: 980px;
+      }
+
+      .statePath{
+        fill: rgba(62,123,182,0.06);
+        stroke: rgba(31,27,58,0.32);
+        stroke-width: 1;
+        vector-effect: non-scaling-stroke;
+        transition: fill 140ms ease, stroke-width 140ms ease, stroke 140ms ease;
+        cursor: pointer;
+      }
+
+      .statePath:hover{
+        fill: url(#hoverGradient);
+        stroke-width: 2.2;
+        stroke: rgba(31,27,58,0.60);
+      }
+      .statePath:focus{
+        fill: url(#hoverGradient);
+        stroke-width: 2.6;
+        stroke: rgba(31,27,58,0.78);
+        outline: none;
+      }
+
+      .stateSelected{
+        fill: var(--tufts-blue) !important;
+        stroke: rgba(31,27,58,0.70);
+        stroke-width: 2.2;
+      }
+
+      .stateCompareSelected{
+        fill: rgba(62,123,182,0.28) !important;
+        stroke: rgba(31,27,58,0.72);
+        stroke-width: 2.2;
+      }
+
+      /* Mobile bottom sheet */
+      @media (max-width: 860px){
+        .overlay{
+          justify-content:center;
+          align-items:flex-end;
+        }
+        .drawer{
+          width: 100%;
+          height: min(76vh, 620px);
+          border-left: none;
+          border-top: 1px solid rgba(31,27,58,0.16);
+          border-radius: 18px 18px 0 0;
+        }
+      }
+
+      /* Screen-reader only */
+      .sr-only{
+        position:absolute;
+        width:1px;
+        height:1px;
+        padding:0;
+        margin:-1px;
+        overflow:hidden;
+        clip:rect(0,0,0,0);
+        white-space:nowrap;
+        border:0;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="root"></div>
+
+    <!-- React + Babel (TypeScript/TSX in-browser) -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- d3-geo + topojson-client for TopoJSON -> SVG paths -->
+    <script src="https://unpkg.com/d3-geo@3/dist/d3-geo.min.js"></script>
+    <script src="https://unpkg.com/topojson-client@3/dist/topojson-client.min.js"></script>
+
+    <!-- App (TSX) -->
+    <script type="text/babel" data-presets="typescript,react">
+      type RuleType =
+        | "REVENUE_ONLY"
+        | "TRANSACTIONS_ONLY"
+        | "REVENUE_OR_TRANSACTIONS"
+        | "REVENUE_AND_TRANSACTIONS";
+
+      type StateNexusEntry = {
+        name: string;
+        abbr: string;
+        revenueThreshold: number; // number (format with commas + $)
+        revenueCurrency: "USD";
+        transactionThreshold: number | null;
+        ruleType: RuleType;
+        notes?: string;
+        lastUpdated: string; // YYYY-MM-DD
+        dorUrl: string;
+        sourceLabel: string;
+        effectiveTiming?: string; // optional
+        registrationUrl?: string; // optional
+      };
+
+      type TooltipState = {
+        visible: boolean;
+        x: number;
+        y: number;
+        abbr: string | null;
+        viaKeyboard: boolean;
+      };
+
+      const { useEffect, useMemo, useRef, useState } = React;
+
+      // -----------------------------
+      // 1) DATA MODEL (LOCAL JSON)
+      //    - Full 50 states + DC included.
+      //    - A few sample states filled; the rest are clearly marked TODO in notes.
+      // -----------------------------
+      const STATE_LIST: Array<{ abbr: string; name: string }> = [
+        { abbr: "AL", name: "Alabama" }, { abbr: "AK", name: "Alaska" }, { abbr: "AZ", name: "Arizona" },
+        { abbr: "AR", name: "Arkansas" }, { abbr: "CA", name: "California" }, { abbr: "CO", name: "Colorado" },
+        { abbr: "CT", name: "Connecticut" }, { abbr: "DE", name: "Delaware" }, { abbr: "DC", name: "District of Columbia" },
+        { abbr: "FL", name: "Florida" }, { abbr: "GA", name: "Georgia" }, { abbr: "HI", name: "Hawaii" },
+        { abbr: "ID", name: "Idaho" }, { abbr: "IL", name: "Illinois" }, { abbr: "IN", name: "Indiana" },
+        { abbr: "IA", name: "Iowa" }, { abbr: "KS", name: "Kansas" }, { abbr: "KY", name: "Kentucky" },
+        { abbr: "LA", name: "Louisiana" }, { abbr: "ME", name: "Maine" }, { abbr: "MD", name: "Maryland" },
+        { abbr: "MA", name: "Massachusetts" }, { abbr: "MI", name: "Michigan" }, { abbr: "MN", name: "Minnesota" },
+        { abbr: "MS", name: "Mississippi" }, { abbr: "MO", name: "Missouri" }, { abbr: "MT", name: "Montana" },
+        { abbr: "NE", name: "Nebraska" }, { abbr: "NV", name: "Nevada" }, { abbr: "NH", name: "New Hampshire" },
+        { abbr: "NJ", name: "New Jersey" }, { abbr: "NM", name: "New Mexico" }, { abbr: "NY", name: "New York" },
+        { abbr: "NC", name: "North Carolina" }, { abbr: "ND", name: "North Dakota" }, { abbr: "OH", name: "Ohio" },
+        { abbr: "OK", name: "Oklahoma" }, { abbr: "OR", name: "Oregon" }, { abbr: "PA", name: "Pennsylvania" },
+        { abbr: "RI", name: "Rhode Island" }, { abbr: "SC", name: "South Carolina" }, { abbr: "SD", name: "South Dakota" },
+        { abbr: "TN", name: "Tennessee" }, { abbr: "TX", name: "Texas" }, { abbr: "UT", name: "Utah" },
+        { abbr: "VT", name: "Vermont" }, { abbr: "VA", name: "Virginia" }, { abbr: "WA", name: "Washington" },
+        { abbr: "WV", name: "West Virginia" }, { abbr: "WI", name: "Wisconsin" }, { abbr: "WY", name: "Wyoming" },
+      ];
+
+      // Sample filled entries (EDIT THESE / add the rest)
+      const SAMPLE_OVERRIDES: Record<string, Partial<StateNexusEntry>> = {
+        CA: {
+          revenueThreshold: 500000,
+          transactionThreshold: null,
+          ruleType: "REVENUE_ONLY",
+          dorUrl: "https://www.cdtfa.ca.gov/",
+          sourceLabel: "Department of Tax and Fee Administration",
+          lastUpdated: "2026-02-24",
+          notes: "Sample entry. Verify and update as needed.",
+        },
+        NY: {
+          revenueThreshold: 500000,
+          transactionThreshold: 100,
+          ruleType: "REVENUE_AND_TRANSACTIONS",
+          dorUrl: "https://www.tax.ny.gov/",
+          sourceLabel: "Department of Taxation and Finance",
+          lastUpdated: "2026-02-24",
+          notes: "Sample entry. Verify and update as needed.",
+          effectiveTiming: "Effective immediately (informational field).",
+        },
+        TX: {
+          revenueThreshold: 500000,
+          transactionThreshold: null,
+          ruleType: "REVENUE_ONLY",
+          dorUrl: "https://comptroller.texas.gov/",
+          sourceLabel: "Comptroller of Public Accounts",
+          lastUpdated: "2026-02-24",
+          notes: "Sample entry. Verify and update as needed.",
+          registrationUrl: "https://comptroller.texas.gov/taxes/permit/",
+        },
+        FL: {
+          revenueThreshold: 100000,
+          transactionThreshold: null,
+          ruleType: "REVENUE_ONLY",
+          dorUrl: "https://floridarevenue.com/",
+          sourceLabel: "Department of Revenue",
+          lastUpdated: "2026-02-24",
+          notes: "Sample entry. Verify and update as needed.",
+        },
+        WA: {
+          revenueThreshold: 100000,
+          transactionThreshold: null,
+          ruleType: "REVENUE_ONLY",
+          dorUrl: "https://dor.wa.gov/",
+          sourceLabel: "Department of Revenue",
+          lastUpdated: "2026-02-24",
+          notes: "Sample entry. Verify and update as needed.",
+        },
+        DC: {
+          revenueThreshold: 100000,
+          transactionThreshold: 200,
+          ruleType: "REVENUE_OR_TRANSACTIONS",
+          dorUrl: "https://otr.cfo.dc.gov/",
+          sourceLabel: "Office of Tax and Revenue",
+          lastUpdated: "2026-02-24",
+          notes: "Sample entry. Verify and update as needed.",
+        },
+      };
+
+      // Build the full JSON-like object (50 + DC) with TODO placeholders.
+      const statesNexusData: Record<string, StateNexusEntry> = (() => {
+        const base: Record<string, StateNexusEntry> = {};
+        for (const s of STATE_LIST) {
+          const override = SAMPLE_OVERRIDES[s.abbr] || {};
+          base[s.abbr] = {
+            name: s.name,
+            abbr: s.abbr,
+            revenueThreshold: typeof override.revenueThreshold === "number" ? override.revenueThreshold : 0,
+            revenueCurrency: "USD",
+            transactionThreshold: override.transactionThreshold ?? null,
+            ruleType: (override.ruleType as RuleType) ?? "REVENUE_ONLY",
+            notes:
+              override.notes ??
+              "TODO: Fill in this state's economic nexus threshold and official links. Informational only; verify with state sources.",
+            lastUpdated: override.lastUpdated ?? "2026-02-24",
+            dorUrl: override.dorUrl ?? "",
+            sourceLabel: override.sourceLabel ?? "Department of Revenue",
+            effectiveTiming: override.effectiveTiming,
+            registrationUrl: override.registrationUrl,
+          };
+        }
+        return base;
+      })();
+
+      // -----------------------------
+      // 2) HELPERS
+      // -----------------------------
+      function formatCurrencyUSD(n: number): string {
+        if (!n || n <= 0) return "—";
+        return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n);
+      }
+      function formatTransactions(n: number | null): string {
+        if (!n || n <= 0) return "—";
+        return new Intl.NumberFormat("en-US").format(n);
+      }
+      function ruleLabel(rule: RuleType): string {
+        switch (rule) {
+          case "REVENUE_ONLY": return "Revenue only";
+          case "TRANSACTIONS_ONLY": return "Transactions only";
+          case "REVENUE_OR_TRANSACTIONS": return "Revenue OR Transactions";
+          case "REVENUE_AND_TRANSACTIONS": return "Revenue AND Transactions";
+          default: return "—";
+        }
+      }
+
+      // FIPS -> USPS abbr (states + DC). (TopoJSON uses numeric state FIPS codes.)
+      const FIPS_TO_ABBR: Record<string, string> = {
+        "01":"AL","02":"AK","04":"AZ","05":"AR","06":"CA","08":"CO","09":"CT","10":"DE","11":"DC",
+        "12":"FL","13":"GA","15":"HI","16":"ID","17":"IL","18":"IN","19":"IA","20":"KS","21":"KY","22":"LA",
+        "23":"ME","24":"MD","25":"MA","26":"MI","27":"MN","28":"MS","29":"MO","30":"MT","31":"NE","32":"NV",
+        "33":"NH","34":"NJ","35":"NM","36":"NY","37":"NC","38":"ND","39":"OH","40":"OK","41":"OR","42":"PA",
+        "44":"RI","45":"SC","46":"SD","47":"TN","48":"TX","49":"UT","50":"VT","51":"VA","53":"WA","54":"WV",
+        "55":"WI","56":"WY",
+      };
+
+      // Load TopoJSON from a static package CDN (no API key).
+      // If you want fully offline, download this JSON and inline it.
+      const US_ATLAS_TOPOJSON_URL = "https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json";
+
+      // -----------------------------
+      // 3) COMPONENTS
+      // -----------------------------
+      function Tooltip(props: {
+        tooltip: TooltipState;
+        entry: StateNexusEntry | null;
+      }) {
+        const { tooltip, entry } = props;
+        if (!tooltip.visible || !entry) return null;
+
+        const offset = 14;
+        const left = Math.min(window.innerWidth - 20, tooltip.x + offset);
+        const top = Math.min(window.innerHeight - 20, tooltip.y + offset);
+
+        return (
+          <div
+            className="tooltip"
+            role="tooltip"
+            aria-live="polite"
+            style={{ left, top }}
+          >
+            <div className="tooltipTitle">{entry.name}</div>
+            <div className="tooltipRow">
+              <span className="pill"><strong>Revenue:</strong>&nbsp;{formatCurrencyUSD(entry.revenueThreshold)}</span>
+              <span className="pill"><strong>Tx:</strong>&nbsp;{entry.transactionThreshold ? formatTransactions(entry.transactionThreshold) : "—"}</span>
+              <span className="pill"><strong>Rule:</strong>&nbsp;{ruleLabel(entry.ruleType)}</span>
+            </div>
+            <div className="muted" style={{ marginTop: 6 }}>
+              {entry.notes ? <span>{entry.notes}</span> : null}
+              <div style={{ marginTop: 4 }}><strong>Last updated:</strong> {entry.lastUpdated}</div>
+            </div>
+          </div>
+        );
+      }
+
+      function StateDrawer(props: {
+        open: boolean;
+        entry: StateNexusEntry | null;
+        compareEnabled: boolean;
+        compareAbbrs: string[];
+        onClose: () => void;
+        onToggleCompare: (abbr: string) => void;
+      }) {
+        const { open, entry, onClose, compareEnabled, compareAbbrs, onToggleCompare } = props;
+        const drawerRef = useRef<HTMLDivElement | null>(null);
+
+        useEffect(() => {
+          if (!open) return;
+          function onKey(e: KeyboardEvent) {
+            if (e.key === "Escape") onClose();
+          }
+          window.addEventListener("keydown", onKey);
+          return () => window.removeEventListener("keydown", onKey);
+        }, [open, onClose]);
+
+        useEffect(() => {
+          if (!open) return;
+          // Move focus into drawer for accessibility.
+          setTimeout(() => {
+            const el = drawerRef.current?.querySelector("button, a, input, [tabindex]:not([tabindex='-1'])") as HTMLElement | null;
+            el?.focus();
+          }, 0);
+        }, [open]);
+
+        if (!open || !entry) return null;
+
+        const compareSelected = compareAbbrs.includes(entry.abbr);
+        const compareDisabled = !compareSelected && compareAbbrs.length >= 3;
+
+        return (
+          <div
+            className="overlay"
+            role="dialog"
+            aria-modal="true"
+            aria-label={`Details for ${entry.name}`}
+            onMouseDown={(e) => {
+              // click outside closes
+              if (e.target === e.currentTarget) onClose();
+            }}
+          >
+            <div className="drawer" ref={drawerRef}>
+              <div className="drawerHeader">
+                <div>
+                  <h3 className="drawerTitle">
+                    {entry.name} <span className="abbr">{entry.abbr}</span>
+                  </h3>
+                  <div className="muted" style={{ fontSize: 12.5, marginTop: 4 }}>
+                    Economic nexus threshold details (informational)
+                  </div>
+                </div>
+                <button className="closeBtn" onClick={onClose} aria-label="Close details panel">Close</button>
+              </div>
+
+              <div className="detailGrid" aria-label="Threshold details">
+                <div className="detailRow">
+                  <span className="muted">Revenue threshold</span>
+                  <strong>{formatCurrencyUSD(entry.revenueThreshold)}</strong>
+                </div>
+                <div className="detailRow">
+                  <span className="muted">Transaction threshold</span>
+                  <strong>{entry.transactionThreshold ? `${formatTransactions(entry.transactionThreshold)} transactions` : "—"}</strong>
+                </div>
+                <div className="detailRow">
+                  <span className="muted">Logical rule</span>
+                  <strong>{ruleLabel(entry.ruleType)}</strong>
+                </div>
+                {entry.effectiveTiming ? (
+                  <div className="detailRow">
+                    <span className="muted">Effective / trigger timing</span>
+                    <strong>{entry.effectiveTiming}</strong>
+                  </div>
+                ) : null}
+                <div className="detailRow">
+                  <span className="muted">Last updated</span>
+                  <strong>{entry.lastUpdated}</strong>
+                </div>
+              </div>
+
+              {entry.notes ? <div className="notes"><strong>Notes:</strong> {entry.notes}</div> : null}
+
+              <div className="btnRow">
+                <a
+                  className="primaryBtn"
+                  href={entry.dorUrl || "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-disabled={!entry.dorUrl}
+                  onClick={(e) => { if (!entry.dorUrl) e.preventDefault(); }}
+                  title={entry.dorUrl ? "Open Department of Revenue website in a new tab" : "Add a DOR URL to enable"}
+                >
+                  {entry.sourceLabel || "Department of Revenue"}
+                </a>
+
+                {entry.registrationUrl ? (
+                  <a
+                    className="secondaryBtn"
+                    href={entry.registrationUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Registration portal
+                  </a>
+                ) : null}
+
+                {compareEnabled ? (
+                  <button
+                    className="secondaryBtn"
+                    onClick={() => onToggleCompare(entry.abbr)}
+                    disabled={compareDisabled}
+                    aria-disabled={compareDisabled}
+                    title={compareDisabled ? "Compare mode supports up to 3 states" : "Toggle this state in compare"}
+                  >
+                    {compareSelected ? "Remove from compare" : "Add to compare"}
+                  </button>
+                ) : null}
+              </div>
+
+              <div className="urlBox" aria-label="Source URL">
+                <div><strong>Source URL:</strong></div>
+                <div>{entry.dorUrl ? entry.dorUrl : "— (add dorUrl in statesNexusData.json)"}</div>
+                {entry.registrationUrl ? (
+                  <div style={{ marginTop: 8 }}>
+                    <div><strong>Registration URL:</strong></div>
+                    <div>{entry.registrationUrl}</div>
+                  </div>
+                ) : null}
+              </div>
+
+              <div className="muted" style={{ marginTop: "auto", fontSize: 12.5 }}>
+                Tip: Use <span className="kbd">Tab</span> to focus states, then <span className="kbd">Enter</span> to open details.
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      function ComparePanel(props: {
+        enabled: boolean;
+        compareAbbrs: string[];
+        onRemove: (abbr: string) => void;
+      }) {
+        const { enabled, compareAbbrs, onRemove } = props;
+        if (!enabled) return null;
+
+        const rows = compareAbbrs.map((abbr) => statesNexusData[abbr]).filter(Boolean);
+
+        return (
+          <div className="compareCard" aria-label="Compare panel">
+            <div className="compareHeader">
+              <div>
+                <h2>Compare (up to 3 states)</h2>
+                <div className="compareHint">
+                  In compare mode, click a state then “Add to compare” (or Shift+Click a state on the map).
+                </div>
+              </div>
+              <div className="muted" style={{ fontSize: 12.5 }}>
+                Selected: <strong>{rows.length}</strong> / 3
+              </div>
+            </div>
+
+            {rows.length === 0 ? (
+              <div className="muted" style={{ fontSize: 13 }}>
+                No states selected yet.
+              </div>
+            ) : (
+              <div style={{ overflowX: "auto" }}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>State</th>
+                      <th>Revenue threshold</th>
+                      <th>Transaction threshold</th>
+                      <th>Rule</th>
+                      <th>DOR link</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rows.map((e) => (
+                      <tr key={e.abbr}>
+                        <td><strong>{e.name}</strong> <span className="muted">({e.abbr})</span></td>
+                        <td>{formatCurrencyUSD(e.revenueThreshold)}</td>
+                        <td>{e.transactionThreshold ? `${formatTransactions(e.transactionThreshold)} tx` : "—"}</td>
+                        <td>{ruleLabel(e.ruleType)}</td>
+                        <td>
+                          {e.dorUrl ? (
+                            <a href={e.dorUrl} target="_blank" rel="noopener noreferrer">
+                              {e.sourceLabel || "Department of Revenue"}
+                            </a>
+                          ) : "—"}
+                        </td>
+                        <td>
+                          <button className="secondaryBtn" onClick={() => onRemove(e.abbr)}>
+                            Remove
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        );
+      }
+
+      function USMap(props: {
+        selectedAbbr: string | null;
+        compareEnabled: boolean;
+        compareAbbrs: string[];
+        onHoverState: (abbr: string | null, clientX: number, clientY: number, viaKeyboard: boolean) => void;
+        onSelectState: (abbr: string) => void;
+        onToggleCompareQuick: (abbr: string) => void;
+      }) {
+        const { selectedAbbr, onHoverState, onSelectState, compareEnabled, compareAbbrs, onToggleCompareQuick } = props;
+        const [features, setFeatures] = useState<any[] | null>(null);
+        const [loadError, setLoadError] = useState<string | null>(null);
+
+        useEffect(() => {
+          let cancelled = false;
+          async function load() {
+            try {
+              const res = await fetch(US_ATLAS_TOPOJSON_URL, { cache: "force-cache" });
+              if (!res.ok) throw new Error(`Map download failed (${res.status})`);
+              const topo = await res.json();
+              // states geometry collection is usually topo.objects.states
+              const geo = (window as any).topojson.feature(topo, topo.objects.states);
+              if (!cancelled) setFeatures(geo.features);
+            } catch (e: any) {
+              if (!cancelled) setLoadError(e?.message || "Unable to load map data.");
+            }
+          }
+          load();
+          return () => { cancelled = true; };
+        }, []);
+
+        const svgRef = useRef<SVGSVGElement | null>(null);
+
+        // Build path generator (projection fit to our SVG viewBox)
+        const pathD = useMemo(() => {
+          if (!features) return null;
+
+          // Create a FeatureCollection for fitting
+          const fc = { type: "FeatureCollection", features };
+
+          const d3geo = (window as any).d3;
+          const projection = d3geo.geoAlbersUsa();
+          // We'll fit to a logical viewBox; paths render nicely responsive.
+          projection.fitSize([975, 610], fc);
+
+          const path = d3geo.geoPath(projection);
+          return (f: any) => path(f) || "";
+        }, [features]);
+
+        function abbrFromFeature(f: any): string | null {
+          // f.id is numeric FIPS (as number or string). Ensure 2-digit.
+          const raw = String(f.id).padStart(2, "0");
+          return FIPS_TO_ABBR[raw] || null;
+        }
+
+        function handleKeyDown(e: React.KeyboardEvent<SVGPathElement>, abbr: string) {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onSelectState(abbr);
+            return;
+          }
+          if (e.key === "Escape") {
+            onHoverState(null, 0, 0, true);
+            return;
+          }
+          // Optional arrow navigation (simple next/prev in DOM order)
+          if (e.key === "ArrowRight" || e.key === "ArrowDown" || e.key === "ArrowLeft" || e.key === "ArrowUp") {
+            e.preventDefault();
+            const paths = Array.from(svgRef.current?.querySelectorAll("path.statePath") || []);
+            const idx = paths.indexOf(e.currentTarget);
+            if (idx < 0) return;
+            const dir = (e.key === "ArrowRight" || e.key === "ArrowDown") ? 1 : -1;
+            const next = paths[(idx + dir + paths.length) % paths.length] as HTMLElement | undefined;
+            next?.focus();
+          }
+        }
+
+        return (
+          <div className="mapCard" aria-label="United States map">
+            <div className="legendRow">
+              <div>
+                Hover a state to preview. Click/tap to open details.
+              </div>
+              <div className="muted">
+                Keyboard: <span className="kbd">Tab</span> • <span className="kbd">Enter</span> • <span className="kbd">Esc</span>
+              </div>
+            </div>
+
+            <div className="mapWrap">
+              {loadError ? (
+                <div style={{ maxWidth: 620, textAlign: "center" }}>
+                  <div style={{ fontWeight: 850, marginBottom: 8 }}>Map failed to load</div>
+                  <div className="muted" style={{ lineHeight: 1.45 }}>
+                    {loadError}<br />
+                    This file fetches a static TopoJSON map from a CDN. If you need fully-offline usage,
+                    download <span className="kbd">states-10m.json</span> from <span className="kbd">us-atlas</span> and inline it.
+                  </div>
+                </div>
+              ) : !features || !pathD ? (
+                <div className="muted">Loading map…</div>
+              ) : (
+                <svg
+                  ref={svgRef}
+                  viewBox="0 0 975 610"
+                  role="img"
+                  aria-label="Interactive map of the United States (states)"
+                >
+                  <defs>
+                    <linearGradient id="hoverGradient" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%" stopColor="var(--silk-blue)"></stop>
+                      <stop offset="30%" stopColor="var(--faded-blue)"></stop>
+                      <stop offset="55%" stopColor="var(--blue-koi)"></stop>
+                      <stop offset="75%" stopColor="var(--moonstone-blue)"></stop>
+                      <stop offset="90%" stopColor="var(--gulfstream)"></stop>
+                      <stop offset="100%" stopColor="var(--pale-teal)"></stop>
+                    </linearGradient>
+                  </defs>
+
+                  <g aria-label="States">
+                    {features.map((f, i) => {
+                      const abbr = abbrFromFeature(f);
+                      if (!abbr) return null;
+
+                      const isSelected = selectedAbbr === abbr;
+                      const isCompare = compareAbbrs.includes(abbr);
+
+                      const entry = statesNexusData[abbr];
+                      const ariaLabelParts = [
+                        entry?.name || abbr,
+                        `Revenue ${formatCurrencyUSD(entry?.revenueThreshold ?? 0)}`,
+                        `Transactions ${entry?.transactionThreshold ? formatTransactions(entry.transactionThreshold) : "none"}`,
+                        `Rule ${entry?.ruleType ? ruleLabel(entry.ruleType) : "unknown"}`,
+                        `Last updated ${entry?.lastUpdated || "unknown"}`
+                      ];
+
+                      return (
+                        <path
+                          key={abbr + "-" + i}
+                          d={pathD(f)}
+                          className={
+                            "statePath" +
+                            (isSelected ? " stateSelected" : "") +
+                            (!isSelected && isCompare ? " stateCompareSelected" : "")
+                          }
+                          tabIndex={0}
+                          role="button"
+                          aria-label={ariaLabelParts.join(". ")}
+                          onMouseEnter={(e) => onHoverState(abbr, e.clientX, e.clientY, false)}
+                          onMouseMove={(e) => onHoverState(abbr, e.clientX, e.clientY, false)}
+                          onMouseLeave={() => onHoverState(null, 0, 0, false)}
+                          onFocus={(e) => {
+                            const r = (e.currentTarget as SVGPathElement).getBoundingClientRect();
+                            onHoverState(abbr, r.left + r.width / 2, r.top + 10, true);
+                          }}
+                          onBlur={() => onHoverState(null, 0, 0, true)}
+                          onKeyDown={(e) => handleKeyDown(e, abbr)}
+                          onClick={(e) => {
+                            // Quick compare: Shift+Click toggles compare selection when enabled
+                            if (compareEnabled && (e.shiftKey || (e as any).nativeEvent?.shiftKey)) {
+                              onToggleCompareQuick(abbr);
+                            } else {
+                              onSelectState(abbr);
+                            }
+                          }}
+                        />
+                      );
+                    })}
+                  </g>
+                </svg>
+              )}
+            </div>
+          </div>
+        );
+      }
+
+      function Search(props: {
+        onPick: (abbr: string) => void;
+      }) {
+        const { onPick } = props;
+        const [value, setValue] = useState("");
+
+        const options = useMemo(() => {
+          return STATE_LIST.map((s) => ({
+            label: `${s.name} (${s.abbr})`,
+            abbr: s.abbr,
+            name: s.name
+          }));
+        }, []);
+
+        function normalize(s: string) {
+          return s.trim().toLowerCase();
+        }
+
+        function tryPick(raw: string) {
+          const q = normalize(raw);
+          if (!q) return;
+
+          // match by exact abbr
+          const abbrHit = options.find(o => normalize(o.abbr) === q);
+          if (abbrHit) return onPick(abbrHit.abbr);
+
+          // match by exact label
+          const labelHit = options.find(o => normalize(o.label) === q);
+          if (labelHit) return onPick(labelHit.abbr);
+
+          // match by name prefix
+          const nameHit = options.find(o => normalize(o.name).startsWith(q));
+          if (nameHit) return onPick(nameHit.abbr);
+        }
+
+        return (
+          <div className="searchWrap" aria-label="Search by state">
+            <span className="searchLabel">Search</span>
+            <div style={{ position: "relative", width: "100%" }}>
+              <input
+                type="text"
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    tryPick(value);
+                  }
+                }}
+                onBlur={() => {
+                  // On blur, if it matches, open it.
+                  tryPick(value);
+                }}
+                placeholder="Type a state name or abbreviation (e.g., CA, California)"
+                aria-label="Search state by name or abbreviation"
+                list="stateOptions"
+              />
+              <datalist id="stateOptions">
+                {options.map((o) => (
+                  <option key={o.abbr} value={o.label} />
+                ))}
+              </datalist>
+            </div>
+            <button
+              className="secondaryBtn"
+              onClick={() => tryPick(value)}
+              aria-label="Open selected state details"
+            >
+              Open
+            </button>
+          </div>
+        );
+      }
+
+      function App() {
+        const [selectedAbbr, setSelectedAbbr] = useState<string | null>(null);
+        const [drawerOpen, setDrawerOpen] = useState(false);
+
+        const [compareEnabled, setCompareEnabled] = useState(false);
+        const [compareAbbrs, setCompareAbbrs] = useState<string[]>([]);
+
+        const [tooltip, setTooltip] = useState<TooltipState>({
+          visible: false,
+          x: 0,
+          y: 0,
+          abbr: null,
+          viaKeyboard: false
+        });
+
+        const selectedEntry = selectedAbbr ? statesNexusData[selectedAbbr] : null;
+        const tooltipEntry = tooltip.abbr ? statesNexusData[tooltip.abbr] : null;
+
+        function openDrawerFor(abbr: string) {
+          setSelectedAbbr(abbr);
+          setDrawerOpen(true);
+        }
+
+        function closeDrawer() {
+          setDrawerOpen(false);
+        }
+
+        function toggleCompare(abbr: string) {
+          setCompareAbbrs((prev) => {
+            if (prev.includes(abbr)) return prev.filter(x => x !== abbr);
+            if (prev.length >= 3) return prev;
+            return [...prev, abbr];
+          });
+        }
+
+        // Data last updated summary (max date across entries)
+        const dataLastUpdated = useMemo(() => {
+          const dates = Object.values(statesNexusData)
+            .map(e => e.lastUpdated)
+            .filter(Boolean)
+            .sort();
+          return dates.length ? dates[dates.length - 1] : "—";
+        }, []);
+
+        return (
+          <div className="page">
+            <header>
+              <h1>Economic Nexus Thresholds by State</h1>
+              <p className="subtitle">
+                Economic nexus generally means a seller may have a sales tax obligation in a state based on
+                sales activity (revenue and/or transactions), even without a physical presence. This site is
+                informational—always verify thresholds and rules with official state sources.
+              </p>
+            </header>
+
+            <div className="controls">
+              <Search onPick={(abbr) => openDrawerFor(abbr)} />
+
+              <label className="toggle" aria-label="Compare mode toggle">
+                <input
+                  type="checkbox"
+                  checked={compareEnabled}
+                  onChange={(e) => {
+                    const on = e.target.checked;
+                    setCompareEnabled(on);
+                    if (!on) setCompareAbbrs([]);
+                  }}
+                />
+                <span>Compare mode</span>
+              </label>
+            </div>
+
+            <div className="content">
+              {compareEnabled ? (
+                <ComparePanel
+                  enabled={compareEnabled}
+                  compareAbbrs={compareAbbrs}
+                  onRemove={(abbr) => setCompareAbbrs(prev => prev.filter(x => x !== abbr))}
+                />
+              ) : null}
+
+              <USMap
+                selectedAbbr={selectedAbbr}
+                compareEnabled={compareEnabled}
+                compareAbbrs={compareAbbrs}
+                onHoverState={(abbr, x, y, viaKeyboard) => {
+                  if (!abbr) {
+                    setTooltip(t => ({ ...t, visible: false, abbr: null, viaKeyboard }));
+                    return;
+                  }
+                  setTooltip({ visible: true, x, y, abbr, viaKeyboard });
+                }}
+                onSelectState={(abbr) => openDrawerFor(abbr)}
+                onToggleCompareQuick={(abbr) => toggleCompare(abbr)}
+              />
+
+              <Tooltip tooltip={tooltip} entry={tooltipEntry} />
+
+              <StateDrawer
+                open={drawerOpen}
+                entry={selectedEntry}
+                compareEnabled={compareEnabled}
+                compareAbbrs={compareAbbrs}
+                onClose={closeDrawer}
+                onToggleCompare={toggleCompare}
+              />
+            </div>
+
+            <footer>
+              <div>Disclaimer: Informational only; verify with state sources.</div>
+              <div>Data last updated: <strong>{dataLastUpdated}</strong></div>
+            </footer>
+
+            <div className="sr-only" aria-live="polite">
+              {drawerOpen && selectedEntry ? `Opened details for ${selectedEntry.name}.` : ""}
+            </div>
+          </div>
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById("root")!).render(<App />);
+    </script>
+
+    <!--
+      Where to fill in the rest:
+      Replace SAMPLE_OVERRIDES entries and add the remaining states in that object.
+      The final object "statesNexusData" already includes all 50 + DC; placeholders use revenueThreshold: 0 and notes: TODO.
+    -->
+  </body>
+</html>
