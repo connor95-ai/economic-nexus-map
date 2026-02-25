@@ -8,29 +8,23 @@
 
   <style>
     :root{
-      /* Brand-ish approximations */
       --tufts-blue:#3E7BB6;
       --alabaster:#F5F2EC;
       --haiti:#1F1B3A;
 
       /* Softer balanced palette */
+      --bg:#EEF3F7;
       --surface:#FFFFFF;
       --surface-2:#F1F5FA;
       --border:#D7E1EE;
       --muted:#5A6078;
       --shadow:0 14px 40px rgba(18, 28, 68, .10);
 
-      /* Transition palette accents (subtle) */
+      /* Hover gradient accents */
       --silk:#BFD2E8;
-      --faded:#A9C4E1;
-      --koi:#86B4DA;
       --moonstone:#6FA7D8;
       --gulf:#5C97CE;
-      --neptune:#4B8BC4;
       --teal:#C8E7E3;
-
-      --focus:#1d4ed8;
-      --danger:#B91C1C;
     }
 
     *{ box-sizing:border-box; }
@@ -38,46 +32,33 @@
     body{
       margin:0;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      background: radial-gradient(1200px 600px at 20% 0%, #E9F1FB 0%, var(--alabaster) 55%, #ECF5F4 100%);
+      background: radial-gradient(1200px 600px at 20% 0%, #E9F1FB 0%, var(--bg) 55%, #ECF5F4 100%);
       color:var(--haiti);
     }
 
-    a{ color:var(--tufts-blue); }
-    a:hover{ text-decoration:underline; }
-
-    .wrap{
-      max-width: 1180px;
-      margin: 0 auto;
-      padding: 18px 16px 40px;
-    }
+    .wrap{ max-width:1180px; margin:0 auto; padding:18px 16px 40px; }
 
     header{
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-      padding: 16px 16px 8px;
-      border: 1px solid var(--border);
-      border-radius: 18px;
+      display:flex; flex-direction:column; gap:8px;
+      padding:16px 16px 10px;
+      border:1px solid var(--border);
+      border-radius:18px;
       background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.78));
       box-shadow: var(--shadow);
       backdrop-filter: blur(6px);
     }
 
-    h1{
-      margin:0;
-      font-size: 24px;
-      letter-spacing: -0.02em;
-    }
+    h1{ margin:0; font-size:24px; letter-spacing:-0.02em; }
     .subtitle{
       margin:0;
-      color: var(--muted);
-      line-height: 1.4;
-      font-size: 13.5px;
-      max-width: 72ch;
+      color:var(--muted);
+      line-height:1.4;
+      font-size:13.5px;
+      max-width:72ch;
     }
 
     .controls{
-      margin-top: 14px;
+      margin-top:14px;
       display:flex;
       gap:10px;
       flex-wrap:wrap;
@@ -85,49 +66,45 @@
     }
 
     .control{
-      flex: 1 1 280px;
+      flex:1 1 280px;
       display:flex;
       gap:8px;
       align-items:center;
-      padding: 10px 12px;
-      border-radius: 14px;
-      border: 1px solid var(--border);
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid var(--border);
       background: rgba(255,255,255,.85);
       box-shadow: 0 8px 22px rgba(18, 28, 68, .06);
     }
 
     .control label{
-      font-size: 12px;
-      color: var(--muted);
+      font-size:12px;
+      color:var(--muted);
       white-space:nowrap;
     }
 
     input[type="text"]{
       width:100%;
-      border: none;
-      outline: none;
-      background: transparent;
-      color: var(--haiti);
-      font-size: 14px;
-      padding: 4px;
+      border:none;
+      outline:none;
+      background:transparent;
+      color:var(--haiti);
+      font-size:14px;
+      padding:4px;
     }
 
     .btn{
-      border: 1px solid var(--border);
+      border:1px solid var(--border);
       background: linear-gradient(180deg, rgba(62,123,182,.95), rgba(62,123,182,.85));
-      color: #fff;
-      padding: 10px 12px;
-      border-radius: 14px;
+      color:#fff;
+      padding:10px 12px;
+      border-radius:14px;
       cursor:pointer;
-      font-weight: 600;
-      font-size: 13px;
-      box-shadow: 0 10px 24px rgba(62,123,182,.22);
-      transition: transform .08s ease, filter .15s ease;
+      font-weight:600;
+      font-size:13px;
+      box-shadow:0 10px 24px rgba(62,123,182,.22);
       user-select:none;
     }
-    .btn:hover{ filter:brightness(1.02); }
-    .btn:active{ transform: translateY(1px); }
-
     .btn.secondary{
       background: rgba(255,255,255,.9);
       color: var(--haiti);
@@ -138,52 +115,42 @@
       display:inline-flex;
       gap:8px;
       align-items:center;
-      padding: 10px 12px;
-      border-radius: 14px;
-      border: 1px solid var(--border);
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid var(--border);
       background: rgba(255,255,255,.85);
-      box-shadow: 0 8px 22px rgba(18, 28, 68, .06);
-      font-size: 13px;
-      color: var(--muted);
+      box-shadow:0 8px 22px rgba(18, 28, 68, .06);
+      font-size:13px;
+      color:var(--muted);
     }
-    .pill strong{ color: var(--haiti); font-weight: 700; }
+    .pill strong{ color:var(--haiti); font-weight:700; }
 
-    .grid{
-      margin-top: 14px;
-      display:grid;
-      grid-template-columns: 1fr;
-      gap: 14px;
-    }
+    .grid{ margin-top:14px; display:grid; grid-template-columns:1fr; gap:14px; }
 
     .card{
-      border: 1px solid var(--border);
-      border-radius: 18px;
+      border:1px solid var(--border);
+      border-radius:18px;
       background: rgba(255,255,255,.82);
       box-shadow: var(--shadow);
       overflow:hidden;
     }
 
     .mapShell{
-      position: relative;
-      padding: 10px;
+      position:relative;
+      padding:10px;
       background: linear-gradient(180deg, rgba(241,245,250,.7), rgba(255,255,255,.55));
+      min-height: 420px;
     }
-
-    /* Map styling */
-    .mapShell svg{
-      width: 100%;
-      height: auto;
-      display:block;
-    }
+    .mapShell svg{ width:100%; height:auto; display:block; }
 
     .state{
-      fill: rgba(62,123,182,.08); /* very light Tufts tint */
+      fill: rgba(62,123,182,.08);
       stroke: rgba(31,27,58,.55);
       stroke-width: 0.7;
       vector-effect: non-scaling-stroke;
       cursor:pointer;
       transition: fill .14s ease, stroke-width .14s ease, filter .14s ease;
-      outline: none;
+      outline:none;
     }
 
     .state:hover,
@@ -211,68 +178,61 @@
       filter:none;
     }
 
-    /* Tooltip */
     .tooltip{
-      position: fixed;
-      z-index: 50;
-      pointer-events: none;
-      max-width: 320px;
+      position:fixed;
+      z-index:50;
+      pointer-events:none;
+      max-width:320px;
       background: rgba(31,27,58,.96);
-      color: #fff;
-      padding: 10px 12px;
-      border-radius: 12px;
-      box-shadow: 0 16px 40px rgba(0,0,0,.28);
-      border: 1px solid rgba(255,255,255,.14);
-      opacity: 0;
+      color:#fff;
+      padding:10px 12px;
+      border-radius:12px;
+      box-shadow:0 16px 40px rgba(0,0,0,.28);
+      border:1px solid rgba(255,255,255,.14);
+      opacity:0;
       transform: translateY(6px);
       transition: opacity .12s ease, transform .12s ease;
-      font-size: 12.5px;
-      line-height: 1.25;
+      font-size:12.5px;
+      line-height:1.25;
+      left: 0;
+      top: 0;
     }
-    .tooltip.show{
-      opacity: 1;
-      transform: translateY(0);
-    }
-    .tooltip .tTitle{ font-weight: 800; margin-bottom: 6px; }
+    .tooltip.show{ opacity:1; transform:translateY(0); }
+    .tooltip .tTitle{ font-weight:800; margin-bottom:6px; }
     .tooltip .tRow{ display:flex; gap:8px; }
-    .tooltip .tKey{ color: rgba(255,255,255,.72); min-width: 110px; }
-    .tooltip .tVal{ color:#fff; }
+    .tooltip .tKey{ color: rgba(255,255,255,.72); min-width:110px; }
 
-    /* Drawer / Bottom sheet on mobile */
     .drawerOverlay{
-      position: fixed;
-      inset: 0;
+      position:fixed;
+      inset:0;
       background: rgba(0,0,0,.26);
-      opacity: 0;
-      pointer-events: none;
+      opacity:0;
+      pointer-events:none;
       transition: opacity .18s ease;
-      z-index: 60;
+      z-index:60;
     }
-    .drawerOverlay.open{
-      opacity: 1;
-      pointer-events: auto;
-    }
+    .drawerOverlay.open{ opacity:1; pointer-events:auto; }
 
     .drawer{
-      position: fixed;
-      top: 0;
-      right: 0;
-      height: 100%;
-      width: 420px;
-      max-width: 92vw;
+      position:fixed;
+      top:0;
+      right:0;
+      height:100%;
+      width:420px;
+      max-width:92vw;
       background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(255,255,255,.94));
       border-left: 1px solid var(--border);
       box-shadow: -18px 0 50px rgba(18, 28, 68, .18);
       transform: translateX(105%);
       transition: transform .22s ease;
-      z-index: 70;
+      z-index:70;
       display:flex;
       flex-direction:column;
     }
     .drawer.open{ transform: translateX(0); }
 
     .drawerHeader{
-      padding: 14px 14px 10px;
+      padding:14px 14px 10px;
       display:flex;
       justify-content:space-between;
       align-items:flex-start;
@@ -280,90 +240,79 @@
       border-bottom: 1px solid var(--border);
       background: linear-gradient(180deg, rgba(241,245,250,.7), rgba(255,255,255,.55));
     }
-    .drawerHeader h2{
-      margin:0;
-      font-size: 16px;
-      letter-spacing: -0.01em;
-    }
-    .drawerHeader .meta{
-      margin-top: 4px;
-      color: var(--muted);
-      font-size: 12px;
-    }
+    .drawerHeader h2{ margin:0; font-size:16px; letter-spacing:-0.01em; }
+    .drawerHeader .meta{ margin-top:4px; color:var(--muted); font-size:12px; }
+
     .iconBtn{
-      border: 1px solid var(--border);
+      border:1px solid var(--border);
       background: rgba(255,255,255,.9);
-      border-radius: 12px;
-      padding: 8px 10px;
+      border-radius:12px;
+      padding:8px 10px;
       cursor:pointer;
-      font-weight: 700;
+      font-weight:700;
     }
+
     .drawerBody{
-      padding: 14px;
+      padding:14px;
       overflow:auto;
       display:flex;
       flex-direction:column;
-      gap: 12px;
+      gap:12px;
     }
+
     .kv{
-      border: 1px solid var(--border);
+      border:1px solid var(--border);
       background: rgba(241,245,250,.7);
-      border-radius: 14px;
-      padding: 12px;
+      border-radius:14px;
+      padding:12px;
     }
     .kv .row{
       display:flex;
       justify-content:space-between;
       gap:10px;
-      padding: 6px 0;
+      padding:6px 0;
       border-bottom: 1px dashed rgba(31,27,58,.12);
-      font-size: 13px;
+      font-size:13px;
     }
     .kv .row:last-child{ border-bottom:none; }
-    .kv .k{ color: var(--muted); }
-    .kv .v{ color: var(--haiti); font-weight: 700; text-align:right; }
+    .kv .k{ color:var(--muted); }
+    .kv .v{ color:var(--haiti); font-weight:700; text-align:right; }
 
     .note{
-      padding: 10px 12px;
-      border-radius: 14px;
-      border: 1px solid rgba(185,28,28,.20);
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(185,28,28,.20);
       background: rgba(185,28,28,.06);
-      color: #7a0f0f;
-      font-size: 13px;
+      color:#7a0f0f;
+      font-size:13px;
     }
 
-    .linkRow{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
-    }
+    .linkRow{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
     .linkBtn{
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      gap:8px;
-      padding: 10px 12px;
-      border-radius: 14px;
-      border: 1px solid var(--border);
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid var(--border);
       background: linear-gradient(180deg, rgba(62,123,182,.95), rgba(62,123,182,.85));
       color:#fff;
       text-decoration:none;
-      font-weight: 700;
-      font-size: 13px;
+      font-weight:700;
+      font-size:13px;
       box-shadow: 0 10px 24px rgba(62,123,182,.18);
     }
+
     .monoUrl{
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size: 12px;
-      color: var(--muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      font-size:12px;
+      color:var(--muted);
       overflow-wrap:anywhere;
     }
 
-    /* Compare panel */
     .compare{
-      padding: 12px 14px 14px;
-      border-top: 1px solid var(--border);
+      padding:12px 14px 14px;
+      border-top:1px solid var(--border);
       background: rgba(241,245,250,.65);
     }
     .compareTop{
@@ -374,88 +323,67 @@
       flex-wrap:wrap;
       margin-bottom:10px;
     }
-    .compareTop .title{
-      font-weight: 800;
-      font-size: 13px;
-    }
+    .compareTop .title{ font-weight:800; font-size:13px; }
+
     .tableWrap{
       overflow:auto;
-      border: 1px solid var(--border);
-      border-radius: 14px;
+      border:1px solid var(--border);
+      border-radius:14px;
       background: rgba(255,255,255,.88);
     }
     table{
       width:100%;
       border-collapse:collapse;
-      font-size: 13px;
-      min-width: 720px;
+      font-size:13px;
+      min-width:720px;
     }
     th,td{
       text-align:left;
-      padding: 10px 10px;
-      border-bottom: 1px solid rgba(31,27,58,.10);
-      vertical-align: top;
+      padding:10px 10px;
+      border-bottom:1px solid rgba(31,27,58,.10);
+      vertical-align:top;
     }
     th{
-      font-size: 12px;
-      color: var(--muted);
+      font-size:12px;
+      color:var(--muted);
       background: rgba(241,245,250,.9);
       position: sticky;
-      top: 0;
-      z-index: 1;
+      top:0;
+      z-index:1;
     }
     tr:last-child td{ border-bottom:none; }
 
     footer{
-      margin-top: 14px;
-      padding: 12px 14px;
+      margin-top:14px;
+      padding:12px 14px;
       display:flex;
       justify-content:space-between;
       gap:10px;
       flex-wrap:wrap;
-      color: var(--muted);
-      font-size: 12.5px;
+      color:var(--muted);
+      font-size:12.5px;
     }
 
     .errorBanner{
-      margin: 12px 12px 0;
-      padding: 10px 12px;
-      border-radius: 14px;
-      border: 1px solid rgba(185,28,28,.22);
+      margin:12px 12px 0;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(185,28,28,.22);
       background: rgba(185,28,28,.07);
-      color: #7a0f0f;
-      font-size: 13px;
+      color:#7a0f0f;
+      font-size:13px;
     }
 
-    /* Focus ring */
-    :focus-visible{
-      outline: 3px solid rgba(29,78,216,.35);
-      outline-offset: 2px;
-      border-radius: 8px;
-    }
-
-    /* Bottom sheet on mobile */
     @media (max-width: 860px){
       .drawer{
-        top: auto;
-        bottom: 0;
-        right: 0;
-        width: 100%;
-        height: 68vh;
-        border-left: none;
-        border-top: 1px solid var(--border);
+        top:auto; bottom:0; right:0;
+        width:100%;
+        height:68vh;
+        border-left:none;
+        border-top:1px solid var(--border);
         transform: translateY(105%);
       }
       .drawer.open{ transform: translateY(0); }
-    }
-
-    /* Screen-reader only */
-    .sr{
-      position:absolute;
-      width:1px;height:1px;
-      padding:0;margin:-1px;
-      overflow:hidden;clip:rect(0,0,0,0);
-      white-space:nowrap;border:0;
     }
   </style>
 </head>
@@ -472,7 +400,7 @@
       <div class="controls" role="region" aria-label="Controls">
         <div class="control" role="search">
           <label for="searchInput">Search</label>
-          <input id="searchInput" type="text" inputmode="search" placeholder="Type a state name or abbreviation (e.g., CA, California)" autocomplete="off" />
+          <input id="searchInput" type="text" placeholder="Type a state name or abbreviation (e.g., CA, California)" autocomplete="off" />
         </div>
 
         <button id="compareToggle" class="btn secondary" type="button" aria-pressed="false">
@@ -488,9 +416,7 @@
 
     <div class="grid">
       <section class="card" aria-label="Map section">
-        <div id="errorHost" class="sr" aria-live="assertive"></div>
         <div class="mapShell" id="mapShell">
-          <!-- The SVG gets injected here -->
           <div id="mapHost" aria-label="Interactive map of the United States"></div>
         </div>
 
@@ -526,10 +452,8 @@
     </div>
   </div>
 
-  <!-- Tooltip (screen-reader readable via aria-describedby on focus) -->
   <div id="tooltip" class="tooltip" role="tooltip" aria-hidden="true"></div>
 
-  <!-- Drawer -->
   <div id="drawerOverlay" class="drawerOverlay" tabindex="-1" aria-hidden="true"></div>
   <aside id="drawer" class="drawer" aria-hidden="true" aria-label="State details panel">
     <div class="drawerHeader">
@@ -544,7 +468,13 @@
 
   <script>
     /******************************************************************
-     * 1) DATA (sample + clearly marked placeholders)
+     * MAP SOURCE (SVG with state boundaries)
+     * If you host your own SVG, replace STATE_SVG_URL.
+     ******************************************************************/
+    const STATE_SVG_URL = "https://raw.githubusercontent.com/VictorCazanave/svg-maps/master/packages/usa/usa.svg";
+
+    /******************************************************************
+     * DATA
      ******************************************************************/
     const RULE_LABEL = {
       REVENUE_ONLY: "Revenue only",
@@ -554,65 +484,22 @@
       NO_NEXUS: "Nexus does not apply"
     };
 
-    // States where general sales tax nexus often does not apply (informational).
-    // Keep/adjust as your policy requires.
     const NO_NEXUS_STATES = new Set(["AK","DE","MT","NH","OR"]);
 
-    // Sample data (fill in the rest)
-    // IMPORTANT: Replace placeholders and verify with official sources.
     const statesNexusData = {
-      "CA": {
-        name: "California", abbr: "CA",
-        revenueThreshold: 500000, revenueCurrency: "USD",
-        transactionThreshold: null,
-        ruleType: "REVENUE_ONLY",
-        notes: "",
-        lastUpdated: "2026-02-24",
-        dorUrl: "https://www.cdtfa.ca.gov/",
-        sourceLabel: "Department of Tax and Fee Administration"
-      },
-      "NY": {
-        name: "New York", abbr: "NY",
-        revenueThreshold: 500000, revenueCurrency: "USD",
-        transactionThreshold: 100,
-        ruleType: "REVENUE_AND_TRANSACTIONS",
-        notes: "",
-        lastUpdated: "2026-02-24",
-        dorUrl: "https://www.tax.ny.gov/",
-        sourceLabel: "Department of Taxation and Finance"
-      },
-      "TX": {
-        name: "Texas", abbr: "TX",
-        revenueThreshold: 500000, revenueCurrency: "USD",
-        transactionThreshold: null,
-        ruleType: "REVENUE_ONLY",
-        notes: "",
-        lastUpdated: "2026-02-24",
-        dorUrl: "https://comptroller.texas.gov/taxes/",
-        sourceLabel: "Comptroller of Public Accounts"
-      },
+      "CA": { name:"California", abbr:"CA", revenueThreshold:500000, revenueCurrency:"USD", transactionThreshold:null, ruleType:"REVENUE_ONLY", notes:"Sample entry. Verify and update.", lastUpdated:"2026-02-24", dorUrl:"https://www.cdtfa.ca.gov/", sourceLabel:"Department of Tax and Fee Administration" },
+      "NY": { name:"New York", abbr:"NY", revenueThreshold:500000, revenueCurrency:"USD", transactionThreshold:100, ruleType:"REVENUE_AND_TRANSACTIONS", notes:"Sample entry. Verify and update.", lastUpdated:"2026-02-24", dorUrl:"https://www.tax.ny.gov/", sourceLabel:"Department of Taxation and Finance" },
+      "TX": { name:"Texas", abbr:"TX", revenueThreshold:500000, revenueCurrency:"USD", transactionThreshold:null, ruleType:"REVENUE_ONLY", notes:"Sample entry. Verify and update.", lastUpdated:"2026-02-24", dorUrl:"https://comptroller.texas.gov/taxes/", sourceLabel:"Comptroller of Public Accounts" },
 
-      // Example NO_NEXUS states
       "OR": { name:"Oregon", abbr:"OR", revenueThreshold:null, revenueCurrency:"USD", transactionThreshold:null, ruleType:"NO_NEXUS", notes:"No general state sales tax.", lastUpdated:"2026-02-24", dorUrl:"https://www.oregon.gov/dor/", sourceLabel:"Department of Revenue" },
       "NH": { name:"New Hampshire", abbr:"NH", revenueThreshold:null, revenueCurrency:"USD", transactionThreshold:null, ruleType:"NO_NEXUS", notes:"No general state sales tax.", lastUpdated:"2026-02-24", dorUrl:"https://www.revenue.nh.gov/", sourceLabel:"Department of Revenue Administration" },
       "DE": { name:"Delaware", abbr:"DE", revenueThreshold:null, revenueCurrency:"USD", transactionThreshold:null, ruleType:"NO_NEXUS", notes:"No general state sales tax.", lastUpdated:"2026-02-24", dorUrl:"https://revenue.delaware.gov/", sourceLabel:"Division of Revenue" },
       "MT": { name:"Montana", abbr:"MT", revenueThreshold:null, revenueCurrency:"USD", transactionThreshold:null, ruleType:"NO_NEXUS", notes:"No general state sales tax.", lastUpdated:"2026-02-24", dorUrl:"https://mtrevenue.gov/", sourceLabel:"Department of Revenue" },
       "AK": { name:"Alaska", abbr:"AK", revenueThreshold:null, revenueCurrency:"USD", transactionThreshold:null, ruleType:"NO_NEXUS", notes:"No statewide sales tax (local taxes may apply).", lastUpdated:"2026-02-24", dorUrl:"https://www.commerce.alaska.gov/", sourceLabel:"State of Alaska" },
 
-      // Placeholder for DC (fill in)
-      "DC": {
-        name: "District of Columbia", abbr: "DC",
-        revenueThreshold: 100000, revenueCurrency: "USD",
-        transactionThreshold: 200,
-        ruleType: "REVENUE_OR_TRANSACTIONS",
-        notes: "Example placeholder — verify.",
-        lastUpdated: "2026-02-24",
-        dorUrl: "https://otr.cfo.dc.gov/",
-        sourceLabel: "Office of Tax and Revenue"
-      }
+      "DC": { name:"District of Columbia", abbr:"DC", revenueThreshold:100000, revenueCurrency:"USD", transactionThreshold:200, ruleType:"REVENUE_OR_TRANSACTIONS", notes:"Example placeholder — verify.", lastUpdated:"2026-02-24", dorUrl:"https://otr.cfo.dc.gov/", sourceLabel:"Office of Tax and Revenue" }
     };
 
-    // Fill missing states with safe placeholders so UI never breaks.
     const ALL_STATE_ABBRS = [
       "AL","AK","AZ","AR","CA","CO","CT","DE","DC","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO",
       "MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"
@@ -641,22 +528,12 @@
           sourceLabel: "Department of Revenue"
         };
       }
-      // If listed as NO_NEXUS, ensure ruleType
       if (NO_NEXUS_STATES.has(abbr)) statesNexusData[abbr].ruleType = "NO_NEXUS";
     }
 
     /******************************************************************
-     * 2) MAP LOADING (single-file safe) + wiring interactivity
-     *
-     * We load an OSS SVG (state paths already defined) and inject it.
-     * This avoids big geometry blobs inside HTML, and avoids JS libs.
+     * DOM refs / state
      ******************************************************************/
-    const MAP_SVG_URL = "https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json";
-    // We do NOT use TopoJSON here to avoid libraries; instead we fetch a ready SVG:
-    // Use a stable CDN-hosted SVG with state IDs (postal abbreviations).
-    // If you have your own SVG, replace this URL with a self-hosted path.
-    const STATE_SVG_URL = "https://raw.githubusercontent.com/VictorCazanave/svg-maps/master/packages/usa/usa.svg";
-
     const mapHost = document.getElementById("mapHost");
     const tooltip = document.getElementById("tooltip");
     const drawer = document.getElementById("drawer");
@@ -666,7 +543,6 @@
     const drawerBody = document.getElementById("drawerBody");
     const closeDrawerBtn = document.getElementById("closeDrawerBtn");
     const selectedLabel = document.getElementById("selectedLabel");
-    const errorHost = document.getElementById("errorHost");
     const dataLastUpdated = document.getElementById("dataLastUpdated");
 
     const compareToggle = document.getElementById("compareToggle");
@@ -674,24 +550,24 @@
     const compareBody = document.getElementById("compareBody");
     const compareCount = document.getElementById("compareCount");
     const clearCompare = document.getElementById("clearCompare");
-
     const searchInput = document.getElementById("searchInput");
 
     let selectedAbbr = null;
     let compareMode = false;
-    let compareList = []; // up to 3
+    let compareList = [];
     let stateElementsByAbbr = new Map();
 
+    /******************************************************************
+     * Helpers
+     ******************************************************************/
     function fmtMoney(n){
       if (n == null) return "—";
-      const s = Number(n).toLocaleString("en-US");
-      return "$" + s;
+      return "$" + Number(n).toLocaleString("en-US");
     }
     function fmtTx(n){
       if (n == null) return "—";
       return Number(n).toLocaleString("en-US");
     }
-
     function computeOverallLastUpdated(){
       let latest = "1900-01-01";
       for (const abbr of ALL_STATE_ABBRS){
@@ -700,62 +576,17 @@
       }
       return latest;
     }
-    dataLastUpdated.textContent = computeOverallLastUpdated();
-
     function setError(msg){
       console.error(msg);
-      const banner = document.createElement("div");
-      banner.className = "errorBanner";
-      banner.textContent = msg;
-      mapHost.innerHTML = "";
-      mapHost.appendChild(banner);
-      errorHost.textContent = msg;
+      mapHost.innerHTML = `<div class="errorBanner">${escapeHtml(msg)}</div>`;
     }
-
-    async function loadSvg(){
-      try{
-        const res = await fetch(STATE_SVG_URL, { cache: "force-cache" });
-        if (!res.ok) throw new Error("SVG fetch failed: " + res.status);
-        const text = await res.text();
-
-        // Parse SVG
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(text, "image/svg+xml");
-        const svg = doc.documentElement;
-
-        // Add a hover gradient to the svg defs
-        const defs = doc.createElementNS("http://www.w3.org/2000/svg","defs");
-        defs.innerHTML = `
-          <linearGradient id="hoverGrad" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="${getComputedStyle(document.documentElement).getPropertyValue('--silk').trim() || '#BFD2E8'}"/>
-            <stop offset="35%" stop-color="${getComputedStyle(document.documentElement).getPropertyValue('--moonstone').trim() || '#6FA7D8'}"/>
-            <stop offset="70%" stop-color="${getComputedStyle(document.documentElement).getPropertyValue('--gulf').trim() || '#5C97CE'}"/>
-            <stop offset="100%" stop-color="${getComputedStyle(document.documentElement).getPropertyValue('--teal').trim() || '#C8E7E3'}"/>
-          </linearGradient>
-        `;
-        svg.insertBefore(defs, svg.firstChild);
-
-        // Ensure responsive viewBox
-        if (!svg.getAttribute("viewBox") && svg.getAttribute("width") && svg.getAttribute("height")){
-          svg.setAttribute("viewBox", `0 0 ${svg.getAttribute("width")} ${svg.getAttribute("height")}`);
-        }
-        svg.removeAttribute("width");
-        svg.removeAttribute("height");
-        svg.setAttribute("preserveAspectRatio","xMidYMid meet");
-
-        // Inject into page (adoptNode)
-        const injected = document.importNode(svg, true);
-        mapHost.innerHTML = "";
-        mapHost.appendChild(injected);
-
-        wireStates(injected);
-      } catch (e){
-        setError("Map failed to load. Check network access or replace STATE_SVG_URL with your own hosted SVG. (" + e.message + ")");
-      }
+    function escapeHtml(s){
+      return String(s ?? "").replace(/[&<>"']/g, c => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+      }[c]));
     }
-
-    function normalizeAbbr(s){
-      return (s || "").trim().toUpperCase();
+    function escapeAttr(s){
+      return escapeHtml(s).replace(/"/g, "&quot;");
     }
 
     function getStateData(abbr){
@@ -771,21 +602,50 @@
 
       if (d.isNoNexus){
         return `
-          <div class="tTitle">${d.name}</div>
-          <div class="tRow"><div class="tKey">Status</div><div class="tVal">${RULE_LABEL.NO_NEXUS}</div></div>
-          <div class="tRow"><div class="tKey">Notes</div><div class="tVal">${escapeHtml(d.notes || "N/A")}</div></div>
-          <div class="tRow"><div class="tKey">Last updated</div><div class="tVal">${escapeHtml(d.lastUpdated || "—")}</div></div>
+          <div class="tTitle">${escapeHtml(d.name)}</div>
+          <div class="tRow"><div class="tKey">Status</div><div>${RULE_LABEL.NO_NEXUS}</div></div>
+          <div class="tRow"><div class="tKey">Notes</div><div>${escapeHtml(d.notes || "N/A")}</div></div>
+          <div class="tRow"><div class="tKey">Last updated</div><div>${escapeHtml(d.lastUpdated || "—")}</div></div>
         `;
       }
 
       return `
-        <div class="tTitle">${d.name}</div>
-        <div class="tRow"><div class="tKey">Revenue</div><div class="tVal">${fmtMoney(d.revenueThreshold)}</div></div>
-        <div class="tRow"><div class="tKey">Transactions</div><div class="tVal">${d.transactionThreshold == null ? "—" : fmtTx(d.transactionThreshold)}</div></div>
-        <div class="tRow"><div class="tKey">Rule</div><div class="tVal">${escapeHtml(RULE_LABEL[d.ruleType] || d.ruleType)}</div></div>
-        ${d.notes ? `<div class="tRow"><div class="tKey">Notes</div><div class="tVal">${escapeHtml(d.notes)}</div></div>` : ``}
-        <div class="tRow"><div class="tKey">Last updated</div><div class="tVal">${escapeHtml(d.lastUpdated || "—")}</div></div>
+        <div class="tTitle">${escapeHtml(d.name)}</div>
+        <div class="tRow"><div class="tKey">Revenue</div><div>${fmtMoney(d.revenueThreshold)}</div></div>
+        <div class="tRow"><div class="tKey">Transactions</div><div>${d.transactionThreshold == null ? "—" : fmtTx(d.transactionThreshold)}</div></div>
+        <div class="tRow"><div class="tKey">Rule</div><div>${escapeHtml(RULE_LABEL[d.ruleType] || d.ruleType)}</div></div>
+        ${d.notes ? `<div class="tRow"><div class="tKey">Notes</div><div>${escapeHtml(d.notes)}</div></div>` : ``}
+        <div class="tRow"><div class="tKey">Last updated</div><div>${escapeHtml(d.lastUpdated || "—")}</div></div>
       `;
+    }
+
+    function showTooltipAt(x,y, html){
+      tooltip.innerHTML = html;
+      tooltip.classList.add("show");
+      tooltip.setAttribute("aria-hidden","false");
+
+      const pad = 14;
+      // temporarily measure
+      tooltip.style.left = "0px";
+      tooltip.style.top = "0px";
+      const rect = tooltip.getBoundingClientRect();
+
+      let left = x + 14;
+      let top = y + 14;
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+
+      if (left + rect.width + pad > vw) left = x - rect.width - 14;
+      if (top + rect.height + pad > vh) top = y - rect.height - 14;
+      left = Math.max(pad, left);
+      top = Math.max(pad, top);
+
+      tooltip.style.left = left + "px";
+      tooltip.style.top = top + "px";
+    }
+    function hideTooltip(){
+      tooltip.classList.remove("show");
+      tooltip.setAttribute("aria-hidden","true");
     }
 
     function openDrawer(abbr){
@@ -795,7 +655,7 @@
       selectedAbbr = abbr;
       selectedLabel.textContent = `${d.name} (${abbr})`;
 
-      // Update map selection class
+      // update map selection class
       for (const [a, el] of stateElementsByAbbr.entries()){
         el.classList.toggle("selected", a === abbr);
       }
@@ -817,7 +677,6 @@
           <div class="row"><div class="k">Revenue threshold</div><div class="v">${d.isNoNexus ? "—" : fmtMoney(d.revenueThreshold)}</div></div>
           <div class="row"><div class="k">Transaction threshold</div><div class="v">${d.isNoNexus ? "—" : (d.transactionThreshold == null ? "—" : fmtTx(d.transactionThreshold))}</div></div>
           <div class="row"><div class="k">Rule</div><div class="v">${escapeHtml(drawerSubtitle.textContent)}</div></div>
-          ${d.effectiveTiming ? `<div class="row"><div class="k">Timing</div><div class="v">${escapeHtml(d.effectiveTiming)}</div></div>` : ``}
           <div class="row"><div class="k">Last updated</div><div class="v">${escapeHtml(d.lastUpdated || "—")}</div></div>
         </div>
       `;
@@ -843,8 +702,6 @@
       drawerOverlay.classList.add("open");
       drawer.setAttribute("aria-hidden","false");
       drawerOverlay.setAttribute("aria-hidden","false");
-
-      // focus close button for accessibility
       closeDrawerBtn.focus({ preventScroll: true });
     }
 
@@ -855,43 +712,12 @@
       drawerOverlay.setAttribute("aria-hidden","true");
     }
 
-    function showTooltipAt(x,y, html){
-      tooltip.innerHTML = html;
-      tooltip.classList.add("show");
-      tooltip.setAttribute("aria-hidden","false");
-
-      // keep inside viewport
-      const pad = 14;
-      const rect = tooltip.getBoundingClientRect();
-      let left = x + 14;
-      let top = y + 14;
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-
-      if (left + rect.width + pad > vw) left = x - rect.width - 14;
-      if (top + rect.height + pad > vh) top = y - rect.height - 14;
-      left = Math.max(pad, left);
-      top = Math.max(pad, top);
-
-      tooltip.style.left = left + "px";
-      tooltip.style.top = top + "px";
-    }
-
-    function hideTooltip(){
-      tooltip.classList.remove("show");
-      tooltip.setAttribute("aria-hidden","true");
-    }
-
     function toggleCompareMode(){
       compareMode = !compareMode;
       compareToggle.setAttribute("aria-pressed", String(compareMode));
       compareToggle.textContent = compareMode ? "Compare: On" : "Compare: Off";
       comparePanel.hidden = !compareMode;
-
-      if (!compareMode){
-        // leaving compare mode doesn't clear selection automatically
-        renderCompare();
-      }
+      renderCompare();
     }
 
     function addToCompare(abbr){
@@ -909,13 +735,6 @@
 
     function renderCompare(){
       compareCount.textContent = String(compareList.length);
-
-      // Update map visual: mark compare states as selected outline (keep current selected fill)
-      for (const [a, el] of stateElementsByAbbr.entries()){
-        const inCompare = compareList.includes(a);
-        el.style.strokeWidth = el.classList.contains("selected") ? "" : (inCompare ? "1.6" : "");
-        el.style.stroke = el.classList.contains("selected") ? "" : (inCompare ? "rgba(31,27,58,.75)" : "");
-      }
 
       compareBody.innerHTML = compareList.map(abbr => {
         const d = getStateData(abbr);
@@ -936,53 +755,159 @@
       }).join("");
     }
 
+    /******************************************************************
+     * SVG load + inject + add gradient defs
+     ******************************************************************/
+    async function loadSvg(){
+      try{
+        const res = await fetch(STATE_SVG_URL, { cache: "force-cache" });
+        if (!res.ok) throw new Error("SVG fetch failed: " + res.status);
+
+        const text = await res.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(text, "image/svg+xml");
+        const svg = doc.documentElement;
+
+        // Add hover gradient to defs
+        const defs = doc.createElementNS("http://www.w3.org/2000/svg","defs");
+        defs.innerHTML = `
+          <linearGradient id="hoverGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="${getComputedStyle(document.documentElement).getPropertyValue('--silk').trim() || '#BFD2E8'}"/>
+            <stop offset="45%" stop-color="${getComputedStyle(document.documentElement).getPropertyValue('--moonstone').trim() || '#6FA7D8'}"/>
+            <stop offset="80%" stop-color="${getComputedStyle(document.documentElement).getPropertyValue('--gulf').trim() || '#5C97CE'}"/>
+            <stop offset="100%" stop-color="${getComputedStyle(document.documentElement).getPropertyValue('--teal').trim() || '#C8E7E3'}"/>
+          </linearGradient>
+        `;
+        svg.insertBefore(defs, svg.firstChild);
+
+        // Responsive
+        if (!svg.getAttribute("viewBox") && svg.getAttribute("width") && svg.getAttribute("height")){
+          svg.setAttribute("viewBox", `0 0 ${svg.getAttribute("width")} ${svg.getAttribute("height")}`);
+        }
+        svg.removeAttribute("width");
+        svg.removeAttribute("height");
+        svg.setAttribute("preserveAspectRatio","xMidYMid meet");
+
+        const injected = document.importNode(svg, true);
+        mapHost.innerHTML = "";
+        mapHost.appendChild(injected);
+
+        // Wire with the requested function
+        wireStates(injected);
+
+        // Global handlers that weren't in your wireStates block
+        drawerOverlay.addEventListener("click", closeDrawer);
+        closeDrawerBtn.addEventListener("click", closeDrawer);
+        document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeDrawer(); });
+
+        compareToggle.addEventListener("click", toggleCompareMode);
+        clearCompare.addEventListener("click", () => { compareList = []; renderCompare(); });
+
+        // Search opens drawer
+        searchInput.addEventListener("input", () => {
+          const q = (searchInput.value || "").trim();
+          if (!q) return;
+
+          const qU = q.toUpperCase();
+          let abbr = null;
+
+          if (qU.length === 2 && statesNexusData[qU]) abbr = qU;
+          if (!abbr && (qU === "D.C." || qU === "WASHINGTON DC")) abbr = "DC";
+
+          if (!abbr){
+            for (const a of ALL_STATE_ABBRS){
+              const d = statesNexusData[a];
+              if (d && d.name.toUpperCase() === qU) { abbr = a; break; }
+            }
+          }
+          if (!abbr){
+            for (const a of ALL_STATE_ABBRS){
+              const d = statesNexusData[a];
+              if (d && d.name.toUpperCase().startsWith(qU)) { abbr = a; break; }
+            }
+          }
+
+          if (abbr){
+            openDrawer(abbr);
+            const el = stateElementsByAbbr.get(abbr);
+            if (el) el.focus({ preventScroll: true });
+          }
+        });
+
+      } catch (e){
+        setError("Map failed to load. If GitHub raw is blocked, host the SVG yourself and set STATE_SVG_URL. (" + e.message + ")");
+      }
+    }
+
+    /******************************************************************
+     * REQUIRED: use your wireStates(svgRoot) exactly
+     ******************************************************************/
     function wireStates(svgRoot){
-      // This SVG uses IDs like "CA", "TX", etc. We attach behavior to all matching paths.
       stateElementsByAbbr.clear();
 
-      // Find any element with id matching a state abbreviation
+      const shapes = Array.from(svgRoot.querySelectorAll("path, polygon, polyline"));
+      const byAbbr = new Map();
+
+      function tryRegister(el, abbr){
+        if (!abbr) return;
+        if (!ALL_STATE_ABBRS.includes(abbr)) return;
+        if (!byAbbr.has(abbr)) byAbbr.set(abbr, el);
+      }
+
+      const abbrRegexes = [
+        /^([A-Z]{2})$/,
+        /^US[-_.]?([A-Z]{2})$/,
+        /[-_.]([A-Z]{2})$/,
+      ];
+
+      for (const el of shapes){
+        const id = (el.getAttribute("id") || "").trim();
+        const cls = (el.getAttribute("class") || "").trim();
+        const data = (el.getAttribute("data-id") || el.getAttribute("data-state") || "").trim();
+
+        const candidates = [id, data, cls].filter(Boolean);
+
+        for (const c of candidates){
+          const up = c.toUpperCase();
+
+          for (const rx of abbrRegexes){
+            const m = up.match(rx);
+            if (m && m[1]) tryRegister(el, m[1]);
+          }
+
+          if (up.length === 2) tryRegister(el, up);
+          if (up.startsWith("US") && up.length === 4) tryRegister(el, up.slice(2));
+        }
+      }
+
+      if (byAbbr.size < 40){
+        setError("Map loaded but state IDs could not be mapped correctly.");
+        return;
+      }
+
       for (const abbr of ALL_STATE_ABBRS){
-        const el = svgRoot.querySelector(`#${CSS.escape(abbr)}`);
+        const el = byAbbr.get(abbr);
         if (!el) continue;
 
         el.classList.add("state");
         const d = getStateData(abbr);
         if (d?.isNoNexus) el.classList.add("noNexus");
 
-        // Keyboard focusable and ARIA
         el.setAttribute("tabindex","0");
         el.setAttribute("role","button");
         el.setAttribute("aria-label", `${d?.name || abbr} (${abbr})`);
-        el.setAttribute("data-abbr", abbr);
-
-        // Events
-        el.addEventListener("mousemove", (ev) => {
-          const html = tooltipHtml(abbr);
-          showTooltipAt(ev.clientX, ev.clientY, html);
-        });
 
         el.addEventListener("mouseenter", (ev) => {
-          const html = tooltipHtml(abbr);
-          showTooltipAt(ev.clientX, ev.clientY, html);
+          showTooltipAt(ev.clientX, ev.clientY, tooltipHtml(abbr));
         });
-
-        el.addEventListener("mouseleave", () => hideTooltip());
-
-        el.addEventListener("focus", () => {
-          // Position tooltip near element
-          const r = el.getBoundingClientRect();
-          const html = tooltipHtml(abbr);
-          showTooltipAt(r.left + r.width/2, r.top + r.height/2, html);
+        el.addEventListener("mousemove", (ev) => {
+          showTooltipAt(ev.clientX, ev.clientY, tooltipHtml(abbr));
         });
-
-        el.addEventListener("blur", () => hideTooltip());
+        el.addEventListener("mouseleave", hideTooltip);
 
         el.addEventListener("click", () => {
-          if (compareMode){
-            addToCompare(abbr);
-            return;
-          }
-          openDrawer(abbr);
+          if (compareMode) addToCompare(abbr);
+          else openDrawer(abbr);
         });
 
         el.addEventListener("keydown", (e) => {
@@ -990,88 +915,17 @@
             e.preventDefault();
             if (compareMode) addToCompare(abbr);
             else openDrawer(abbr);
-          } else if (e.key === "Escape"){
-            closeDrawer();
           }
         });
 
         stateElementsByAbbr.set(abbr, el);
       }
 
-      // If map didn't contain expected IDs
-      if (stateElementsByAbbr.size < 40){
-        setError("The loaded SVG did not contain expected state IDs. Replace STATE_SVG_URL with an SVG whose state paths have IDs like 'CA', 'TX', etc.");
-        return;
-      }
-
-      // Set initial label
       selectedLabel.textContent = "None";
-
-      // Global interactions
-      drawerOverlay.addEventListener("click", closeDrawer);
-      closeDrawerBtn.addEventListener("click", closeDrawer);
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") closeDrawer();
-      });
-
-      // Compare controls
-      compareToggle.addEventListener("click", toggleCompareMode);
-      clearCompare.addEventListener("click", () => {
-        compareList = [];
-        renderCompare();
-      });
-
-      // Search (type name or abbr)
-      searchInput.addEventListener("input", () => {
-        const q = (searchInput.value || "").trim();
-        if (!q) return;
-
-        const qU = q.toUpperCase();
-        let abbr = null;
-
-        if (qU.length === 2 && statesNexusData[qU]) abbr = qU;
-        if (!abbr && qU === "D.C.") abbr = "DC";
-        if (!abbr && qU === "WASHINGTON DC") abbr = "DC";
-        if (!abbr){
-          // match by name
-          for (const a of ALL_STATE_ABBRS){
-            const d = statesNexusData[a];
-            if (!d) continue;
-            if (d.name.toUpperCase() === qU) { abbr = a; break; }
-          }
-        }
-
-        // partial match (autocomplete-ish): first that startsWith
-        if (!abbr){
-          const qClean = qU.replace(/\./g,"");
-          for (const a of ALL_STATE_ABBRS){
-            const d = statesNexusData[a];
-            if (!d) continue;
-            if (d.name.toUpperCase().startsWith(qClean) || a.startsWith(qClean)){
-              abbr = a; break;
-            }
-          }
-        }
-
-        if (abbr){
-          // Open drawer and also focus the state on map
-          openDrawer(abbr);
-          const el = stateElementsByAbbr.get(abbr);
-          if (el) el.focus({ preventScroll: true });
-        }
-      });
-    }
-
-    function escapeHtml(s){
-      return String(s ?? "").replace(/[&<>"']/g, c => ({
-        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-      }[c]));
-    }
-    function escapeAttr(s){
-      return escapeHtml(s).replace(/"/g, "&quot;");
     }
 
     // Boot
+    dataLastUpdated.textContent = computeOverallLastUpdated();
     loadSvg();
   </script>
 </body>
